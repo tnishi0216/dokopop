@@ -1,0 +1,16 @@
+LIBRARY         DCHOOK
+DESCRIPTION     'DC hook for event hot keys'
+
+SECTIONS
+	.sdata		READ WRITE SHARED
+	.sbss		READ WRITE SHARED
+	.stext		READ SHARED
+
+EXPORTS
+	Config	@1
+	Init	@2
+	Uninit	@3
+	Config2 @4
+	Capture @5
+	WaitForCaptureResult @6
+

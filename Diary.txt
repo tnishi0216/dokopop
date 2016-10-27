@@ -1,0 +1,280 @@
+ http://grabacr.net/archives/1132
+■BUG
+・amodiの.NET Framework versionは？
+・SetWindowsHookEx問題
+  - 32bit/64bit両方load→32bitはOK、64bitはrun on load context
+  - 32bitのみload→32bitはOK、64bitは無反応
+  - 64bitのみload→64bitはOK、32bitはrun on load context
+  - 64bitを先にlaunch、32bitをあとからload→32bitはOK、64bitはrun on load context
+  - 64bit/32bitをload、その後64bitのみinit/config、そのあと32bitのみInitのみ→32bit Initを実行するまでは64bitはOK、32bitのInitを行うと64bitはrun on load context
+  - 64bitを異なるディレクトリで実行→変わらず
+[一般動作]
+・[B] Edge@Win10@VMware@PWS300で文字認識できているのにポップアップしない時がある→FAQ
+  →位置を固定、フォーカス移動
+・[B] ログインのstartupでamodiが例外で落ちる。FileNotFoundで監視用フォルダーが見つからない？
+・[C] Windows shutdownでExMODIが例外？
+・[B] .NETを4.0から3.5にできないか？
+・[B?] main prgのmain threadがblocking状態になるとなぜUI全体が止まる？
+  →止まっているところは少なくともHook関数内ではないらしい(returnまでの時間が１秒以内だった）
+・[B] まだ倍率処理がうまく働かない
+  - Firefox→拡大なしでOK
+  - IE→拡大処理必要
+・[C] clickによるCaptureImageはmainからの呼び出しにしたほうがいいのでは？
+  →どのみちwaitするのだから、問題なければこのままでいいかも？
+・[C] Capture APIが64/32bit両方で呼ばれてしまうのはまずいのでは？単なる無駄？
+  →せめてbit数を判断してからであれば・・・
+・[B?] MODIがインストールされていない状況でDokoPop!を起動、その後MODIをインストールするがamodiが複数起動してOCRが動作しない状態があった
+	  →amodi.exeが終了しない条件がある？
+	  →MODI uninstall/installをやってみたが再現せず。OS install後初回だけ？
+・[C][Win10] SharePoint DesignerをWindows10にインストールするとき、.NETのインストールを促すが、エラーとなりできない。→そもそも.NETは入っているのでインストール不要。installerのバグ？
+・[B] 従来方式の文字列抽出が動作しなくなった？
+  →DKPUHK64.dllをloadしたため。DKPUHK64をhookさせると32bitアプリ上でhookが正しく動作しない（詳細の動作は不明）
+  →なぜ32bitアプリで64bit DLLがhookされるのか？
+  まとめると、
+   - 64bitDLLを使用すると・・・32bitアプリ上で動作しなくなる（64bitアプリはOK)
+   - 64bitDLLを外すと・・・・・32bitアプリは動作、64bitアプリはNG
+　 - 64bit DLLをloadすると、32bitアプリ上にマウスを移動してもDLL attachされない。(32/64bit両方)
+   - 64bit DLLをloadし、32bitアプリ上でmouse操作すると、64bit/32bit両方のDLLの処理が走る。ありえないだろう？？
+	 ↑attachされていないのになぜ反応できる？？
+	 →64bit DLLはDKPUHK64.exeで走り、32bit DLLはDCHookTest.exeで走っている！！なぜ？
+	 →DKPUHK64.exeを別プロセスから起動しても再現する。DLLのInit()呼び出しをしなければ再現しない。
+	   SetWindowsHookEx()の使用に問題があるらしい。
+	 →別アプリなのになぜ影響するのか？DLLの何かがぶつかっている？
+	 http://resources.infosecinstitute.com/using-setwindowshookex-for-dll-injection-on-windows/
+	 を熟読すると何かヒントがある？
+	 →64bitのみInitを行うと64bitアプリ上で正常動作し、32bitアプリ上ではDKPUHK64.exeのプロセス上で動く
+   - ProcessExplorerで確認すると、64bitアプリ(メモ帳)のloadされているDLLにDKPUHK64.DLLがいない
+	 →dchk64.exeのみを直接実行した場合は問題ない？？(DKPUHK64.DLLがメモ帳にhookしていた)
+	 →32bit側のInit()をしないとどうなる？
+	   →bingo!! DKPUHK64.DLLがloadされた
+   - [済] 64bit DLLのUninit()が呼ばれない
+	 →32bit DLLがUninit()されたときにDKPUHK64.exeが終了している？？
+	 →UnloadのあとにUninitが呼ばれていた→Uninit->Unloadにした
+・[B] メモ帳で文字化け
+  →meta fileの再生で EMR_EXTTEXTOUTWのテキストが化け化け
+  →64bit DLLを無効にしたらその問題は発生しなくなったが、別問題が発生
+・[C] インクリメンタルサーチを有効にした直後、OCR Errorが発生する
+  →Reboot()しないようにすると、その後は正常に動作する。
+  →とりあえずReboot()をはずした（必要性が今のところ無くなったので）
+・[C] Chromeで座標がずれる@VAIO Pro11
+  →切り抜きは対象windowのみに限定し、click pointも100,100固定にせず、対象windowでclipしたほうがいいのでは？
+  →それは対応済み。しかし問題はwindow8の拡大機能だった。
+  http://grabacr.net/archives/1132
+  GetDpiForMonitor, CDPI classあたりが肝か？
+  →GetDeviceCaps(LOGPIXELSx)を使用すればいいだけ？
+  →取得方法が見つからず。ユーザー入力でとりあえず対処
+  →ResolutionScaleだったがうまく動かない？
+・[C] AMODIのtemporary folderをlockしているとAMODIが起動できない（起動しても何も言わずに終了）
+・[?] XPのdpi scalingは問題なかった？
+[安定性]
+・[B] inc.srchを有効にしているとDKPUHK64.exeで落ちた。→MouseMoveのところをcomment out
+・[B] inc.srch＋Ctrl+右クリックで激しくやっているとAMODIで落ちる
+  - inc.srchを有効にして、タスクトレイのdpで右クリックメニューを出し、説明書を表示にカーソルを合わせるとAMODIで落ちる@win7
+・[B] FileSyncで検索するとFileSyncがassertion failureを起こし、PDHKU64.exeが落ちる
+  - SyncExecFrm.cpp TSyncExecFrame::lbLogDrawItem 627
+  - XP(xw8400)では問題なし
+・[A?] 検索動作しなくなるときがある？@win7
+  →OS再起動などで再現しなくなった？
+・[B?] amodiを使用するとofficeのinstallが始まる？@win7
+  →OS再起動などで再現しなくなった？
+・[Q] DokoPop!がPDICを起動すると前回と異なるpathにあるPDICが起動してしまう@vaio→portable版だから。FAQにあったほうがいい
+・[C] ゾンビDKPUHK64.exeの処理
+・[C] pdhk64.exeが死んだ時の対策
+・[?] win8でlog off時にpdhk64.exeが落ちる？
+・[?] stand-by復帰後AMODIが落ちる？@XP
+【済】
+・[B][amodi] ファイル削除時の例外処理追加
+・[B] WinXPでinc.srchがまったく動かない？
+  →WinXPでは、event/threadはDLL単位ではなく、DLL instance単位で生成する必要があった
+・[B] インクリメンタルサーチが頻繁に発生するため重くなる→検索の頻度を下げる必要がある
+  →カーソルが停止してから0.3秒後、など
+  →0.1秒後になるようにしてあるのに重い。64bitアプリ(IEなど)上で重くなるようだ。
+  →OCR Errorが発生するとファイル書き込み待ちの３秒でwaitされていた。
+  →本来そこでwaitしてもストップするのはおかしい。waitは別threadで行うようにする
+  →別threadで実行するようにした→OK
+・[B] メモ帳でOCRが動作しない
+  →GetDIBits()でメモリ不足エラーが発生している
+  →MODIのinstallが「マイコンピュータから実行」になっていた（本当は「マイコンピュータからすべて実行」）
+
+■DPI awareness
+http://ascii.jp/elem/000/000/905/905248/ - わかりやすい説明(日本語)
+http://www.telerik.com/blogs/winforms-scaling-at-large-dpi-settings-is-it-even-possible- - 簡単な概要説明
+http://kynosarges.org/WindowsDpi.html - こちらのほうがいい説明？
+https://msdn.microsoft.com/ja-jp/library/windows/desktop/dn469266%28v=vs.85%29.aspx - HighDPI 対応一覧など様々な情報
+https://msdn.microsoft.com/ja-jp/library/windows/desktop/dd464659%28v=vs.85%29.aspx - High DPI対応プログラミング(8.1用しか書いていない？)
+Windows8.1では 96dpi(100%), 120dpi(125%), 144dpi(150%), 192dpi(200%)の四つある
+・確認事項
+ - WinXPでもDPIを変更するとDokoPop!は正しく動作しなかったのでは？
+・試しにやってみること - manifestをDPI awareに変えてみる
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" >
+  <asmv3:application>
+    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+      <dpiAware>true</dpiAware>
+    </asmv3:windowsSettings>
+  </asmv3:application>
+</assembly>
+・やること
+ - manifestでDPI awarenessを指定(or SetProcessDpiAwareness API) - DokoPop!はmonitorごとにする必要がある(ただし8.1以降)
+ - GetDpiForMonitor() でDPI取得 (8.1以降のみ)
+ - WM_DPICHANGEDをhandlingする
+ ↑この方法だと8.1以降しか対応できないのでは？
+・やること・その２
+https://msdn.microsoft.com/ja-jp/library/windows/desktop/dn469266%28v=vs.85%29.aspx#appendix_a_setting_high_DPI_in_windows
+これより、
+ScaleFactor = (LogicalMonitorWidth/LogicalDesktopWidth) / (PhysicalMonitorWidth/PhysicalDesktopWidth)
+
+MONITORINFOEX LogicalMonitorInfo;
+LogicalMonitorInfo.cbSize = sizeof(MONITORINFOEX);       
+GetMonitorInfo(hMonitor, &LogicalMonitorInfo);
+LogicalMonitorWidth = LogicalMonitorInfo.rcMonitor.right - LogicalMonitorInfo.rcMonitor.left;
+
+LogicalDesktopWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+
+(PhysicalDesktopWidth, PhisicalMonitorWidth) = QueryDisplayConfig()のDISPLAYCONFIG_MODE_INFOのpModeInfoArray[i].sourceMode.width
+
+(参考)Windows8には、
+PhysicalToLogicalPoint/LogicalToPhysicalPointというものがあるそうな。
+https://msdn.microsoft.com/ja-jp/library/windows/desktop/dn384112%28v=vs.85%29.aspx
+
+PhysicalToLogicalPointForPerMonitorDPI function/LogicalToPhysicalPointForPerMonitorDPI - これはDPI-awareness leveloの影響を受けない (Win8.1以降)
+GetDpiForMonitor - (Win8.1以降)
+
+？Physical Desktop Width/Physical Monitor Width
+> To get the physical desktop width and physical monitor width, call QueryDisplayConfig. For each DISPLAYCONFIG_MODE_INFO in the returned pModeInfoArray, check the pModeInfoArray[i].sourceMode.width (and height and position) to reconstruct the bounding rect of all the monitors.
+とあるが、どのように取得すればいいのだ？
+sourceがdesktopでtargetがmonittor？
+
+以上が正しいとすると、ScaleFactorは、
+ScaleFactor = (1280/1280) / (1920/1920) = 1 となってしまう？？＠VAIO
+
+■TODO
+・[B] x64は別ディレクトリにすると従来フックが動くようになるのでは？
+  →なさそう
+・[B-] MODIインストールは専用画面にする(URLジャンプ)
+  - 最初の画面は専用DLGにする
+  →一旦自分のHP(source forge?)に飛んでからredirect?
+・[B] 常に認識を行うAMODIをもう一つ用意して、ポップアップするまでの時間を短縮してみてはどうか？
+  - 少ししか移動していない場合、認識した座標のオフセットを計算するとか？
+・[B] MODIインストール後、DokoPop!再起動無しにできないか？
+  →AMODI.exeを実行する必要があるため、処理としては結構重い
+  →Wizard形式にする必要があるのでは？
+・Wizard形式の検討
+  - AMODI.exe実行エラー→MODIがインストールされていないと仮定する
+  - インストール可否の問い合わせ
+  - Webページを表示してインストールを行う←自前のHPを用意する
+	- インストールの一番最後にDokoPop!の操作(再起動？）を促す
+・[B] Ctrlキーを離したら閉じるを外すが動かない
+・[B] aero/metro有効時の動作テスト
+・[B] PDIC本体の起動確認はどうする？
+・[B] VUP機能
+・[B] Q&Aの用意
+・[C] VUP通知機能
+・[C] amodi OCR動作中をどこかで出したほうがいいのでは？
+・[C] もう少しclickable areaを広くできないか？pdfではヒットさせるのが難しい→MARGIN_UNDER_CLICKで調整
+・[C] metro上、Win8/PDF Viewer上などwin8独自アプリでの動作テスト
+・[B] biggestがヒットしない
+・[C] 二重起動動作テスト
+・[C] installer
+  - version自動付け替え機能
+・[B?] popup検索時もmulti threadにする
+  - それより、優先順位の高いものから優先的に表示したほうがいいかもしれない
+  - どこで時間がかかっているのかもう少し詳しく調べる
+・[C] AMODI異常終了対策
+  - DLLも一緒に死亡するため、再起動しかない？→設定が元に戻るものがあるためよろしくない
+・[C?] PDIC上ではinc.srchが動作しないようにする→問題ない？
+・[C] button downをtriggerにしているが、button upをtriggerにしてup cancelするのを止めてみては？
+  [文言]
+   MODIをインストールするとDokoPop!で検索できるアプリを増やすことができます。
+   (URL)を参考にインストールを行ってください。
+   ※リンク先のページが正しく表示されない場合は、"MODI OCR インストール"でネット検索して調べてみてください。
+   ※Win2Kではそのままでは使用できません。
+・[C] AMODIの終了対策
+  - DokoPop!再起動でいいか？
+  - 最低でも警告を出した方が？
+・[C] ネットワークモード - AMODIをserver上に置く
+  - Windows共有でいい？ - この際、ファイル指定が必要
+  - TCP/IPは高速だけど、面倒だしな。。
+	reponseが悪ければTCP/IPを考える
+
+■BUG完了
+・[B] MODI install - タイミングが悪いと、
+  MODIインストール中にMODI認識→再起動→MODI誤認（installされていない）→再びインストールしろDialog
+  →intervalを置いてcheckするようにした
+・[B] MODIインストールDIALOGを閉じるとタスクバーにアイコンが残る
+  →FormCreate中にdialogを表示させたため→IdleProcへ
+・[A] 従来のdokopopが動かなくなった@vaio
+  →USE_VXD対応によりWindowsNT flagがfalseになってしまったため、GetTextFromPoint()が実質何も実行せず-1を返していたため。
+・[B?] 初期化時に64側のConfig2が呼ばれない？
+  →pdhk64が初期化完了する前にConfigしていた
+・PDFで微妙に上下位置がずれるときがある→認識対象文字列の先頭に余計な空行が入る場合があったため
+・[C] インクリメンタルサーチONで落ちる
+  - Config2()を呼び出しているだけのはずだが、hook/unhookが呼ばれている
+	→Config2()からTHookLoader::Captureまでの間に呼ばれている
+	→config直後にmouse move messageがcallbackされ、すぐにcaptureするからいけないのか？
+	→いや、hDll->Capture()自体が不安定だった。ということは潜在的にあった問題？(AMODI=OFF)
+	→DBWをOFFにしたら解決（では何が本当の原因？）
+・[B] VS2010のエディターで正常に動かない
+  →click pointが100pixelくらい右にずれている？上下方向も
+  →amodi側は問題なし。captured imageとcursor座標がずれている？
+   - capture pageをしてもずれている。
+  →わかった。mouse cursorはGetWindowRect()によるwindow全体なのに対し、
+	画像はGetWindowDC()+BitBlt(hdc)でやっているため、hdcが対象になってしまう。
+  →screen座標系でpointを扱い、画像はGetWindowRect()の領域をBitBltすることで対応
+・[B][inc.srch] マウス下のアプリが落ちる(task manager@7 task manager,explorer@XP)
+  →SendMessage( hwnd, WM_PAINT, (WPARAM)hdcMeta, 0 );
+	で落ちていたので、RETRYMETAを0にした→まだ落ちる
+  →MouseProcとDoCaptureを分離すれば安定するんじゃなかろうか？
+  →結論：分離して、DBWは不安定にし、DCHookTest.exeのbreakpointも不安定要因
+・[A] ChromeでCtrl+右クリックするとhit windowが出る直前にChromeが落ちる
+  →CaptureTextが悪いようだ
+  →ExtTextOutX()の書き換え(METAEXTTEXTOUT)自体が原因(代替関数の問題ではない）
+  →今までなぜ動いていた？
+  - SetWriteProtect()でprotect解除したのが悪いようだ
+  - それより、hProcessがerrorを起こしNULLだった
+	→これで落ちることは解消できたが、hProcessがNULLの問題がある
+・[CB] OpenProcessでerror
+  →EnablePrivilege()を追加することでOK
+・[B] inc.srchの動作が重い
+  - ExecOCR-2の後がほぼ停止状態
+  →MODI OCR Errorが発生したときに1.4secほど止まる
+  →白の画像ができている
+  →時々GetDIBits()で失敗(error code不明)。
+  →画像コピーのエラーチェックをしっかりやったらMODI OCR Errorは起きていない
+
+■FAQ
+・管理者権限のアプリ上では動作しない
+　→管理者権限でDoioPop!を起動すれば可能
+  →MODIを使用すれば可能？
+
+■Note
+・DCHook.dllをVisualC++ 2010でビルドすると、Windows2000で動作しなくなってしまう！！
+  （LoadLibraryでエラー）
+  →DCHook/DCHook.6.0.slnをVisualStudio2008で開き、ビルドする
+・64bitアプリ上→32bitDLLのみが反応
+  32bitアプリ上→32bit/64bit両方のDLLが反応
+
+■MODI
+WindowsXP以降対応(?)
+- MDI to TIFF File Converter
+  →インストールしてみたがbuildできず(C:\Program Files (x86)\modiconvにmdivwctl.dllというファイルは見つからなかった）
+- SharePoint Designer 2007をインストール
+  http://www.microsoft.com/ja-jp/download/details.aspx?id=21581
+  "C:\Program Files (x86)\Common Files\Microsoft Shared\MODI\12.0"
+  に
+  MDIVWCTL.DLL
+  というファイルができるので、これをC#のプロジェクトの参照パスに指定する
+  ※MODI/11.0ではamodiがbuildできない(MODIが見つからないerror)@XP/VS2010
+- SharePoint Designerなんて使わない、ほかの方法はないか？
+  http://support.microsoft.com/kb/982760/ja-jp
+  ただし、動作未確認→リンク切れ2014.11.11
+
+■BUILD
+・DCHook64 - VisualC++ 2010で作成
+・2016.9.22
+  DCHook.vcprojにx64用のConfigurationを追加、VS3008でx64をビルドできるようにした。
+  DCHook\VS2003, DCHook\VS2008, DCHook\VS2015というディレクトリを作成したがいずれも正常にいかない。
+  VS2008については.vcprojファイルをDCHook\DCHook.vcprojファイルと比較して設定すればうまく動くようになると思う
+  現時点のプロジェクト
+  DCHook.6.0.sln, DCHook.vcprojをVS2008でビルドする
+  ※DCHook.slnはVS2010用
+
