@@ -2,7 +2,7 @@
 #include <tchar.h>
 #pragma hdrstop
 #include "MonitorScale.h"
-void dbw(const char *,...);
+#include "Util.h"
 
 #if WINVER<0x0601
 #define QDC_ALL_PATHS                   0x00000001
@@ -19,7 +19,7 @@ typedef enum
     DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HDMI                    =  5,
     DISPLAYCONFIG_OUTPUT_TECHNOLOGY_LVDS                    =  6,
     DISPLAYCONFIG_OUTPUT_TECHNOLOGY_D_JPN                   =  8,
-    DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDI                     =  9,
+	DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDI                     =  9,
     DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EXTERNAL    = 10,
     DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EMBEDDED    = 11,
     DISPLAYCONFIG_OUTPUT_TECHNOLOGY_UDI_EXTERNAL            = 12,
@@ -38,7 +38,7 @@ typedef enum
 } DISPLAYCONFIG_ROTATION;
 typedef enum
 {
-    DISPLAYCONFIG_SCALING_IDENTITY                  = 1,
+	DISPLAYCONFIG_SCALING_IDENTITY                  = 1,
     DISPLAYCONFIG_SCALING_CENTERED                  = 2,
     DISPLAYCONFIG_SCALING_STRETCHED                 = 3,
     DISPLAYCONFIG_SCALING_ASPECTRATIOCENTEREDMAX    = 4,
@@ -188,38 +188,22 @@ public:
 		{ return ::GetProcAddress(hInst, name); }
 };
 
-static TDllHandle *dllHandle = NULL;
-static FNGetDisplayConfigBufferSizes _GetDisplayConfigBufferSizes;
-static FNQueryDisplayConfig _QueryDisplayConfig;
-static bool called = false;
-static int prevDpi = 0;
-class TDestructor {
-public:
-	~TDestructor(){ if (dllHandle){ delete dllHandle; dllHandle = NULL; } }
-} destructor;
-
 int GetMonitorScale()
 {
 	int dpi = 96;
 
-	if (!called){
-		called = true;
-		HINSTANCE hDll = LoadLibrary( _T("user32") );
-		if (!hDll)
-			return dpi;
+	HINSTANCE hDll = LoadLibrary( _T("user32") );
+	if (!hDll)
+		return dpi;
 
-		TDllHandle hInst(hDll);
-		dllHandle = new TDllHandle(hDll);
-
-		_GetDisplayConfigBufferSizes = (FNGetDisplayConfigBufferSizes)dllHandle->GetProcAddress("GetDisplayConfigBufferSizes");
-		if (!_GetDisplayConfigBufferSizes)
-			return dpi;
-		_QueryDisplayConfig = (FNQueryDisplayConfig)dllHandle->GetProcAddress("QueryDisplayConfig");
-		if (!_QueryDisplayConfig)
-			return dpi;
-	}
-
-	if (!dllHandle) return dpi;
+	TDllHandle hInst(hDll);
+		
+	FNGetDisplayConfigBufferSizes _GetDisplayConfigBufferSizes = (FNGetDisplayConfigBufferSizes)GetProcAddress(hInst, "GetDisplayConfigBufferSizes");
+	if (!_GetDisplayConfigBufferSizes)
+		return dpi;
+	FNQueryDisplayConfig _QueryDisplayConfig = (FNQueryDisplayConfig)GetProcAddress(hInst, "QueryDisplayConfig");
+	if (!_QueryDisplayConfig)
+		return dpi;
 
 	POINT pt;
 	GetCursorPos( &pt );
@@ -230,19 +214,19 @@ int GetMonitorScale()
 	DISPLAYCONFIG_MODE_INFO *pModeInfoArray = NULL;
 	bool ok = false;
 	while (1){
-	UINT32 numofpath;
-	UINT32 numofmode;
+		UINT32 numofpath;
+		UINT32 numofmode;
 		LONG ret = _GetDisplayConfigBufferSizes(QDC_DATABASE_CURRENT, &numofpath, &numofmode);
 		if (ret!=ERROR_SUCCESS)
 			break;
 		if (numofpath==0)
 			break;
-	
+
 		dpis = new DISPLAYCONFIG_PATH_INFO[numofpath];
 		if (!dpis) break;
 		pModeInfoArray = new DISPLAYCONFIG_MODE_INFO[numofmode];
 		if (!pModeInfoArray) break;
-	DISPLAYCONFIG_TOPOLOGY_ID tid;
+		DISPLAYCONFIG_TOPOLOGY_ID tid;
 		//Note: QDC_ONLY_ACTIVE_PATHSÇéwíËÇ∑ÇÈÇ∆parameter errorÇ™ï‘Ç¡ÇƒÇ≠ÇÈÅHÅH
 		ret = _QueryDisplayConfig(QDC_DATABASE_CURRENT, &numofpath, dpis, &numofmode, pModeInfoArray, &tid);	//TODO: Windows7 or later
 		if (ret == ERROR_INSUFFICIENT_BUFFER){
@@ -269,8 +253,8 @@ int GetMonitorScale()
 				ok = true;
 				dbw("ok: %d %d @(%d,%d)", PhysicalDesktopWidth, PhysicalMonitorWidth, pt.x, pt.y);
 				break;
+			}
 		}
-	}
 		break;
 	}
 
@@ -278,7 +262,7 @@ int GetMonitorScale()
 	if (pModeInfoArray) delete[] pModeInfoArray;
 
 	if (ok)
-		return prevDpi = dpi * PhysicalDesktopWidth / PhysicalMonitorWidth;
+		return dpi * PhysicalDesktopWidth / PhysicalMonitorWidth;
 	return dpi;
 }
 

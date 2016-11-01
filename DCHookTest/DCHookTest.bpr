@@ -7,7 +7,8 @@
     <OBJFILES value="obj\DCHookTest.obj obj\DCHookMain.obj obj\StringLib.obj 
       obj\PopupConfig.obj obj\Util.obj obj\Notify.obj obj\mustr.obj 
       obj\HookDLl.obj obj\HookLoader.obj obj\DCHookLoader.obj obj\prgprof.obj 
-      obj\MODINotifyDlg.obj obj\prgconfig.obj obj\OCRTextFrm.obj"/>
+      obj\MODINotifyDlg.obj obj\prgconfig.obj obj\OCRTextFrm.obj 
+      obj\MonitorScale.obj"/>
     <RESFILES value="DCHookTest.res obj\icon.res"/>
     <IDLFILES value=""/>
     <DEFFILE value=""/>
