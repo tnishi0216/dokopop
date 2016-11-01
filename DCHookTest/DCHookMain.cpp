@@ -184,6 +184,9 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	}
 
 //	Application->OnIdle = IdleHandler;
+
+	if (fWow64)
+		tmReInit64->Enabled = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
@@ -577,6 +580,13 @@ void __fastcall TDCHookMainForm::tmMODINotifyTimer(TObject *Sender)
 	if (!AMODIRunable()){
 		NotifyAMODI();
 	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TDCHookMainForm::tmReInit64Timer(TObject *Sender)
+{
+	tmReInit64->Enabled = false;
+	Unhook();
+	Hook();
 }
 //---------------------------------------------------------------------------
 // Mouse Events
