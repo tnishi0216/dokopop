@@ -4,16 +4,16 @@
 ------------------------------------------------------------------------
 %NEWMAJOR=2
 %NEWMINOR=0
-%NEWRELEASE=24
+%NEWRELEASE=25
 %POST=
 %OLDMAJOR=2
 %OLDMINOR=0
-%OLDRELEASE=23
+%OLDRELEASE=24
 %OLDPOST=
 
 %DATE_Y=16		ŒöŠJ“ú
 %DATE_M=11
-%DATE_D=01
+%DATE_D=09
 
 %TIME_H=02
 %TIME_M=00
