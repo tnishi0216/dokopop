@@ -230,8 +230,8 @@ int GetMonitorScale()
 	DISPLAYCONFIG_MODE_INFO *pModeInfoArray = NULL;
 	bool ok = false;
 	while (1){
-	UINT32 numofpath;
-	UINT32 numofmode;
+		UINT32 numofpath;
+		UINT32 numofmode;
 		LONG ret = _GetDisplayConfigBufferSizes(QDC_DATABASE_CURRENT, &numofpath, &numofmode);
 		if (ret!=ERROR_SUCCESS)
 			break;
@@ -242,7 +242,7 @@ int GetMonitorScale()
 		if (!dpis) break;
 		pModeInfoArray = new DISPLAYCONFIG_MODE_INFO[numofmode];
 		if (!pModeInfoArray) break;
-	DISPLAYCONFIG_TOPOLOGY_ID tid;
+		DISPLAYCONFIG_TOPOLOGY_ID tid;
 		//Note: QDC_ONLY_ACTIVE_PATHSを指定するとparameter errorが返ってくる？？
 		ret = _QueryDisplayConfig(QDC_DATABASE_CURRENT, &numofpath, dpis, &numofmode, pModeInfoArray, &tid);	//TODO: Windows7 or later
 		if (ret == ERROR_INSUFFICIENT_BUFFER){
@@ -254,7 +254,7 @@ int GetMonitorScale()
 			dbw("ret=%d", ret);
 			break;
 		}
-
+	
 		for (int i=0;i<(int)numofpath;i++){
 			//Note: DISPLAYCONFIG_PATH_ACTIVEの定義が不明
 			//	Activeなpathが最初列挙される、とdocumentにあるので問題ないと思うが
@@ -269,8 +269,8 @@ int GetMonitorScale()
 				ok = true;
 				dbw("ok: %d %d @(%d,%d)", PhysicalDesktopWidth, PhysicalMonitorWidth, pt.x, pt.y);
 				break;
+			}
 		}
-	}
 		break;
 	}
 
