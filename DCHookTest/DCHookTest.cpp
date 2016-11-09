@@ -28,7 +28,7 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #if __PROTO
 	SYSTEMTIME st;
 	GetSystemTime(&st);
-	if ( (st.wYear>=2016 && st.wMonth>=12) || st.wYear>=2017){
+	if ( (st.wYear>=2017 && st.wMonth>=2) || st.wYear>=2018){
 		int ret = MessageBox(NULL, "試作版の使用期限が切れました。新しいDokoPop!を入手してください", APPNAME, MB_YESNO);
 		if (ret != IDNO){
 			ShowLatestVersion();
