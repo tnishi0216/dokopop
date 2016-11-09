@@ -2653,7 +2653,7 @@ object DCHookMainForm: TDCHookMainForm
       Caption = '-'
     end
     object miOption: TMenuItem
-      Caption = '設定(&O)...'
+      Caption = '設定(&O)'
       OnClick = miOptionClick
     end
     object miReadMe: TMenuItem
@@ -2661,7 +2661,7 @@ object DCHookMainForm: TDCHookMainForm
       OnClick = miReadMeClick
     end
     object miAbout: TMenuItem
-      Caption = 'バージョン(&V)...'
+      Caption = 'バージョン(&V)'
       OnClick = miAboutClick
     end
     object miCheckLatest: TMenuItem
