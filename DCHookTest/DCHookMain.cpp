@@ -584,9 +584,14 @@ void __fastcall TDCHookMainForm::tmMODINotifyTimer(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::tmReInit64Timer(TObject *Sender)
 {
+	// 初回起動時のみこの処理をしないとpopupしない
+	// 再ログイン時は不要
 	tmReInit64->Enabled = false;
 	Unhook();
+	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, false);
+	Ini->WriteInteger(PFS_CONFIG, PFS_USE64, !use64);
 	Hook();
+	Ini->WriteInteger(PFS_CONFIG, PFS_USE64, use64);
 }
 //---------------------------------------------------------------------------
 // Mouse Events
