@@ -184,9 +184,6 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	}
 
 //	Application->OnIdle = IdleHandler;
-
-	if (fWow64)
-		tmReInit64->Enabled = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
@@ -582,16 +579,17 @@ void __fastcall TDCHookMainForm::tmMODINotifyTimer(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall TDCHookMainForm::tmReInit64Timer(TObject *Sender)
+void __fastcall TDCHookMainForm::tmReInitTimer(TObject *Sender)
 {
-	// 初回起動時のみこの処理をしないとpopupしない
-	// 再ログイン時は不要
-	tmReInit64->Enabled = false;
-	Unhook();
-	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, false);
-	Ini->WriteInteger(PFS_CONFIG, PFS_USE64, !use64);
-	Hook();
-	Ini->WriteInteger(PFS_CONFIG, PFS_USE64, use64);
+	// amodi.exeのlaunchに非常に時間がかかる場合がある
+	// ex.古いPCでstartupに登録している場合
+	//    →input idleになってもmain windowの生成に時間がかかっているのかもしれない
+	// AMODIAvailがtrueになるまで初期化を続ける
+	tmReInit->Enabled = false;
+	SetupAMODI();
+	if (AMODIAvail){
+		SetupConfig2();
+	}
 }
 //---------------------------------------------------------------------------
 // Mouse Events
@@ -1340,6 +1338,8 @@ void TDCHookMainForm::SetupAMODI()
 				HWND hwnd = FindAMODI();
 				if (hwnd)
 					AMODIAvail = true;
+				else
+					tmReInit->Enabled = true;	// retry later
 			}
 		}
 	}

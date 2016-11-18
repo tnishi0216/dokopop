@@ -424,8 +424,14 @@ bool _WinExec( const char *cmd, int show, int waittime, const char *dir)
 		return false;
 	bool ret = true;
 	if ( waittime ){
+//		DWORD startTime = GetTickCount();
 		int r = WaitForInputIdle( pi.hProcess, waittime );
 		ret = r==0;
+		if (!ret){
+			dbw("CreateProcess: %d, 0x%X", r, GetLastError());
+		} else {
+//			dbw("CreateProcess: %d", GetTickCount() - startTime);
+		}
 	}
 	CloseHandle( pi.hProcess );
 	return ret;
@@ -491,11 +497,11 @@ bool LaunchAMODI()
 #else
 		SW_HIDE;
 #endif
-	if (!_WinExec( AMODI_EXE_PATH, show, 500))
+	if (!_WinExec( AMODI_EXE_PATH, show, 300))
 		return false;
 
 	HWND hwnd = NULL;
-	for (int i=0;i<30;i++){
+	for (int i=0;i<10;i++){
 		hwnd = FindAMODI();
 		if (hwnd)
 			break;
