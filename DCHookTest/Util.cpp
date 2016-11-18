@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
+#include <tchar.h>
 #include "prgconfig.h"
 #include "Util.h"
 #include "prgprof.h"

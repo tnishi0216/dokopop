@@ -880,7 +880,7 @@ int WINAPI Config( int clickonly, int keyaction, int keyflag )
 __declspec(dllexport)
 int WINAPI Config2( const struct TDCHConfig *cfg )
 {
-	DBW("Config2: %d %d", cfg->ScaleX, cfg->ScaleY);
+	DBW("Config2: %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseAMODI, (int)ExtAMODI);
 
 	MoveSend = cfg->MoveSend ? true : false;
 	MoveSent = false;
@@ -1190,6 +1190,7 @@ j_discard:
 
 bool DoCapture(HWND hwnd, POINT pt, bool movesend, bool image_only, bool runOnLaunchedProc, bool non_block)
 {
+	DBW("DoCapture: %d %d %d %d %d", image_only, runOnLaunchedProc, hwndAMODI, ExtAMODI, OnlyAMODI);
 	CursorPoint = ScreenPoint = pt;
 	ScreenToClient( hwnd, &CursorPoint );
 
