@@ -36,7 +36,7 @@
 
 #define	DPI_DETECT			0		// DPI Detect in main (monitor‚²‚Æ‚ÌÝ’è‚ª‚Å‚«‚È‚¢‚½‚ßdebug—p)
 
-#define	DEF_USE64			(false)
+#define	DEF_USE64			(fWow64)
 
 /*------------------------------------------*/
 /*		Definitions							*/
@@ -654,7 +654,7 @@ bool TDCHookMainForm::Hook()
 		return true;	// already loaded
 	}
 
-	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, false);
+	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, DEF_USE64);
 	hDll = new TDCHookLoader(use64);
 	if (!hDll->LoadHook(Handle)){
 		DBW("Load failed");
