@@ -342,6 +342,7 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 		Ini->WriteInteger(PFS_CONFIG, PFS_USE64, PopupConfigDlg->cbUse64->Checked);
 		SaveConfig();
 		SetupConfig();
+		tmReInit->Enabled = false;
 		if (!useAMODI && (CaptureMode & CM_IMAGE) && !AMODIAvail){
 			// AMODI off->ON ‚©‚Â AMODI‚ª‚¢‚È‚¢ê‡
 			NotifyAMODI();
