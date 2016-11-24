@@ -148,7 +148,7 @@ public:		// ƒ†[ƒU[éŒ¾
 	void SetupConfig2();
 	void SetupAMODI();
 	bool EnablePopup;
-	bool DoPopup( const tchar *text, const tchar *prevtext, bool movesend );
+	bool DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend );
 	tchar *PopupText;
 	int PopupLoc;
 	bool PopupMoveSend;

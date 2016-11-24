@@ -415,7 +415,7 @@ void __fastcall TDCHookMainForm::miConfigClick(TObject *Sender)
 void __fastcall TDCHookMainForm::miDdeTestClick(TObject *Sender)
 {
 #ifdef _DEBUG
-	DoPopup( _t("test"), NULL, false );
+	DoPopup( _t("test"), 0, NULL, false );
 #endif
 }
 //---------------------------------------------------------------------------
@@ -1006,7 +1006,8 @@ void TDCHookMainForm::ClosePdic( TDdeClientConv *dde )
 	dde->CloseLink();
 	delete dde;
 }
-bool TDCHookMainForm::DoPopup( const tchar *text, const tchar *prevtext, bool movesend )
+// click_pos: mouse clickされたtext上の文字位置(text先頭からのoffset)
+bool TDCHookMainForm::DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend )
 {
 	static int ct = 0;
 	if ( ct >= 1 ){
@@ -1113,8 +1114,20 @@ bool TDCHookMainForm::DoPopup( const tchar *text, const tchar *prevtext, bool mo
 		DdePoke( PdicDde, "PopupSearchConfig", "o1w1" );	// overlap window and no wait transaction
 		if ( prevtext && (prevtext != text) ){
 			//DBW("prevtext="FMTS,prevtext);
+#if 1
+			int len = _tcslen(prevtext);
+			tchar *buf = new tchar[len+10];
+			_itow( STR_DIFF(text, prevtext) + click_pos, buf, 10 );	// クリック位置
+			tchar *dp = buf + _tcslen(buf);
+			*dp++ = ',';
+			wcscpy( dp, prevtext );
+			DdePoke( PdicDde, "PopupSearch3", buf );
+	//		ExecuteMacro( "PopupSearch3", true );
+			delete[] buf;
+#else
 			DdePoke( PdicDde, "PopupSearch2", (tchar*)prevtext );
 	//		ExecuteMacro( "PopupSearch2", true );
+#endif
 			WaitTransaction( PdicDde );
 		} else {
 			//DBW("text="FMTS,text);
@@ -1209,7 +1222,7 @@ void TDCHookMainForm::EvPopup(TMessage &msg)
 	edPrev->Text = loc + prevstart;
 #endif
 
-	if (DoPopup( text + start, text + prevstart, movesend )){
+	if (DoPopup( text + start, loc - start, text + prevstart, movesend )){
 		// done
 		delete[] text;
 	} else {
