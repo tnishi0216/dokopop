@@ -14,8 +14,9 @@
 // fLongestがTRUEの場合は、最高10語までgetする(.)を終わりとみなす
 // about   : いい加減なところをクリックしても単語さえあれば必ずgetする
 // alnum   : 英数字以外は無視
+// numPrev : N語前の単語を拾う
 
-bool GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount, bool about, bool alnum )
+bool GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount, bool about, bool alnum, int numPrev )
 {
 	if ( !about )
 		if ( !IsWordChar( *(str+pos) ) )
@@ -61,6 +62,7 @@ rescan:
 		wordtop = p; 
 	const tchar *wordtail = NULL;
 	const tchar *wordprev = NULL;
+	const tchar *wordprev2 = NULL;
 	bool fSpc = false;
 	// posにある単語のstartとendを求める
 	while ( *p ){
@@ -83,6 +85,7 @@ rescan:
 		} else {
 			// 単語文字
 			if ( fSpc ){
+				wordprev2 = wordprev;
 				wordprev = wordtop;
 				wordtop = p;
 				fSpc = FALSE;
@@ -129,7 +132,10 @@ rescan:
 	end = STR_DIFF( wordtail, orgp );
 	if ( start == end )
 		return false;
-	if ( wordprev ){
+	if ( numPrev >= 2 && wordprev2 ){
+		prevstart = STR_DIFF( wordprev2, orgp );
+	} else
+	if ( numPrev >= 1 && wordprev ){
 		prevstart = STR_DIFF( wordprev, orgp );
 	} else {
 		prevstart = start;

@@ -1262,13 +1262,16 @@ void TDCHookMainForm::EvPopup(TMessage &msg)
 	if (!msg.LParam)
 		return;
 
+	int pdicVer = GetPdicVersion();
+	const int numPrev = pdicVer >= 0x050A0018 ? 2 : 1;	// ver.5.10.24à»è„
+		
 	tchar *text = (tchar*)msg.LParam;
 	int loc = msg.WParam & ~FLG_MOVESEND;
 	bool movesend = msg.WParam & FLG_MOVESEND ? true : false;
 	
 	int start, end;
 	int prevstart;
-	if ( !GetWord( text, loc, start, end, prevstart, true, 10, true, IgnoreJ ) ){
+	if ( !GetWord( text, loc, start, end, prevstart, true, 10, true, IgnoreJ, numPrev ) ){
 		// no words
 		delete[] text;
 		return;
