@@ -43,7 +43,7 @@ typedef unsigned short ushort;
 // prototypes //
 int isalphanum( tuchar c );
 bool mbIsWordChar( unsigned short c );
-BOOL GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount, bool about, bool alnum );
+bool GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount, bool about, bool alnum, int numPrev );
 bool mbGetWord( const tchar *str, int pos, int &start, int &end, bool fLongest, int wordcount );
 
 // inlines //
