@@ -944,7 +944,7 @@ bool DdePoke( TDdeClientConv *dde, AnsiString Item, const wchar_t *Data )
 		}
 	}
 	}
-	DdeFreeStringHandle (ddeMgr->DdeInstId, hszItem);
+	DdeFreeStringHandle(ddeMgr->DdeInstId, hszItem);
 	return r;
 }
 #endif
