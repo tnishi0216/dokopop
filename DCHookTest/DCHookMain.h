@@ -169,6 +169,7 @@ public:		// ƒ†[ƒU[éŒ¾
 	void OpenDicGroup( const char *name );
 	TDdeClientConv *OpenPdic( const char *topic );
 	void ClosePdic( TDdeClientConv *dde );
+	int GetPdicVersion();
 
 	// WM_COPYDATA control //
 	HWND FindPdic( );

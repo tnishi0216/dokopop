@@ -64,6 +64,7 @@ bool DdePoke( TDdeClientConv *dde, AnsiString Item, AnsiString Data );
 #ifdef USE_UNICODE
 // UnicodeÇ≈ìnÇ∑èÍçá
 bool DdePoke( TDdeClientConv *dde, AnsiString Item, const wchar_t *Data );
+bool DdeRequest( TDdeClientConv *dde, AnsiString Item, char *Data, int &inoutDataLen );
 #endif;
 void GetGroupList(TMyIni &ini, TStringList &list);
 
@@ -945,6 +946,25 @@ bool DdePoke( TDdeClientConv *dde, AnsiString Item, const wchar_t *Data )
 				DdeFreeDataHandle( hdata );
 		}
 	}
+	DdeFreeStringHandle(ddeMgr->DdeInstId, hszItem);
+	return r;
+}
+bool DdeRequest( TDdeClientConv *dde, AnsiString Item, char *Data, int &ioDataLen )
+{
+	const int ddeFmt = /*dde->DdeFmt*/CF_UNICODETEXT;
+	HSZ hszItem = DdeCreateStringHandle(ddeMgr->DdeInstId, Item.c_str(), CP_WINANSI );
+	if ( !hszItem ) return false;
+	bool r = false;
+	HDDEDATA hdata = DdeClientTransaction( NULL, 0, (HCONV)dde->Conv, hszItem, ddeFmt, XTYP_REQUEST, 10000, NULL);
+	if (hdata || DdeGetLastError(ddeMgr->DdeInstId) != DMLERR_NO_ERROR){
+		r = true;
+		if (hdata){
+			ioDataLen = DdeGetData(hdata, (LPBYTE)Data, ioDataLen, 0);
+			DdeFreeDataHandle( hdata );
+		} else {
+			Data[0] = '0';
+			ioDataLen = 0;
+		}
 	}
 	DdeFreeStringHandle(ddeMgr->DdeInstId, hszItem);
 	return r;
@@ -1016,6 +1036,31 @@ void TDCHookMainForm::ClosePdic( TDdeClientConv *dde )
 {
 	dde->CloseLink();
 	delete dde;
+}
+// XX.XX.XXXX (hex) 1+1+2 byteç\ê¨
+int TDCHookMainForm::GetPdicVersion()
+{
+	TDdeClientConv *PdicDde = OpenPdic("PDIC");
+	if (!PdicDde) return 0;
+	int version = 0;
+#ifdef USE_UNICODE
+	char buf[40];
+	if (DdeRequest(PdicDde, "GetVersion", buf, sizeof(buf))){
+		wchar_t *str = (wchar_t*)buf;
+		version = _wtoi( str ) << 24;
+		const wchar_t *p = wcschr( str, '.' );
+		if (p){
+			version |= _wtoi( p+1 ) << 16;
+			p = wcschr( p+1, '.' );
+			if (p){
+				version |= _wtoi( p+1 );
+			}
+		}
+		//DBW("version: %X", version);
+	}
+#endif
+	ClosePdic( PdicDde );
+	return version;
 }
 // click_pos: mouse clickÇ≥ÇÍÇΩtextè„ÇÃï∂éöà íu(textêÊì™Ç©ÇÁÇÃoffset)
 bool TDCHookMainForm::DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend )
