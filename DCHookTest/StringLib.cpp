@@ -15,11 +15,11 @@
 // about   : いい加減なところをクリックしても単語さえあれば必ずgetする
 // alnum   : 英数字以外は無視
 
-BOOL GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount, bool about, bool alnum )
+bool GetWord( const tchar *str, int pos, int &start, int &end, int &prevstart, bool fLongest, int wordcount, bool about, bool alnum )
 {
 	if ( !about )
 		if ( !IsWordChar( *(str+pos) ) )
-			return FALSE;
+			return false;
 //	while ( *(str+pos) == ' ' || *(str+pos) == '\t' ){
 //		pos++;
 //	}
@@ -61,7 +61,7 @@ rescan:
 		wordtop = p; 
 	const tchar *wordtail = NULL;
 	const tchar *wordprev = NULL;
-	BOOL fSpc = FALSE;
+	bool fSpc = false;
 	// posにある単語のstartとendを求める
 	while ( *p ){
 		if ( !IsWordChar( *p ) || (alnum && !isalphanum(*p)) ){
@@ -79,7 +79,7 @@ rescan:
 					}
 				}
 			}
-			fSpc = TRUE;
+			fSpc = true;
 		} else {
 			// 単語文字
 			if ( fSpc ){
@@ -99,7 +99,7 @@ rescan:
 	if ( (unsigned)wordtop - (about ? 3 : 0) > (unsigned)(orgp + pos) ){
 		// 単語の区切りだった、単語の最初がposより後ろにあった
 		// about = trueの場合は、３文字分ほどいいかげん差を足しておく
-		return FALSE;
+		return false;
 	}
 
 	if ( fLongest ){
@@ -109,7 +109,7 @@ rescan:
 				if ( !fSpc ){
 					if ( --wordcount == 0 )
 						break;
-					fSpc = TRUE;
+					fSpc = true;
 				}
 			} else {
 				fSpc = FALSE;
@@ -134,7 +134,7 @@ rescan:
 	} else {
 		prevstart = start;
 	}
-	return TRUE;
+	return true;
 }
 #if 0
 bool mbGetWord( const tchar *str, int pos, int &start, int &end, bool fLongest, int wordcount )
@@ -149,7 +149,7 @@ bool mbGetWord( const tchar *str, int pos, int &start, int &end, bool fLongest, 
 	const tchar *p = orgp;
 	const tchar *wordtop = p;
 	const tchar *wordtail = NULL;
-	BOOL fSpc = FALSE;
+	bool fSpc = false;
 	while ( 1 ){
 		sp = p;
 		LD_CHAR( c, p );
@@ -160,11 +160,11 @@ bool mbGetWord( const tchar *str, int pos, int &start, int &end, bool fLongest, 
 				wordtail = sp;
 				break;
 			}
-			fSpc = TRUE;
+			fSpc = true;
 		} else {
 			if ( fSpc ){
 				wordtop = sp;
-				fSpc = FALSE;
+				fSpc = false;
 			}
 		}
 	}
@@ -187,10 +187,10 @@ bool mbGetWord( const tchar *str, int pos, int &start, int &end, bool fLongest, 
 				if ( !fSpc ){
 					if ( --wordcount == 0 )
 						break;
-					fSpc = TRUE;
+					fSpc = true;
 				}
 			} else {
-				fSpc = FALSE;
+				fSpc = false;
 			}
 		}
 		wordtail = sp;
@@ -200,7 +200,7 @@ bool mbGetWord( const tchar *str, int pos, int &start, int &end, bool fLongest, 
 		wordtail = sp;
 	start = STR_DIFF( wordtop, orgp );
 	end = STR_DIFF( wordtail, orgp );
-	return TRUE;
+	return true;
 }
 bool mbIsWordChar( unsigned short c )
 {
