@@ -24,7 +24,7 @@ const char *AMODI_EXE_PATH = "amodi.exe";
 
 const char *EXMODIST_EXE_PATH = "ExMODIst.exe";
 
-bool WindowsNT = false;
+bool WindowsNT = true;
 bool fWow64 = false;
 
 HWND hwndMain = NULL;

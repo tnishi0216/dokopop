@@ -74,6 +74,7 @@ __fastcall TDCHookMainForm::TDCHookMainForm(TComponent* Owner)
 	hDll = NULL;
 	EnablePopup = true;
 
+#if 0
 	WindowsNT = false;
 
 	OSVERSIONINFO VersionInfo;
@@ -84,6 +85,7 @@ __fastcall TDCHookMainForm::TDCHookMainForm(TComponent* Owner)
 			WindowsNT = true;
 			break;
 	}
+#endif
 	CheckWOW64();
 	BootUp = true;
 	Capturing = false;
