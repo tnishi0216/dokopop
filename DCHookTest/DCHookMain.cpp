@@ -912,10 +912,14 @@ bool DdePoke( TDdeClientConv *dde, AnsiString Item, AnsiString Data )
 	bool r = false;
 	if ( hszDat ){
 		HDDEDATA hdata = DdeClientTransaction( (LPBYTE)hszDat, (DWORD)-1, (HCONV)dde->Conv, hszItem,
-		dde->DdeFmt, XTYP_POKE, 10000, NULL);
-		r = hdata ? true : false;
+			dde->DdeFmt, XTYP_POKE, 10000, NULL);
+		if (hdata || DdeGetLastError(ddeMgr->DdeInstId) != DMLERR_NO_ERROR){
+			r = true;
+			if (hdata)
+				DdeFreeDataHandle( hdata );
+		}
 	}
-	DdeFreeStringHandle (ddeMgr->DdeInstId, hszItem);
+	DdeFreeStringHandle(ddeMgr->DdeInstId, hszItem);
 	return r;
 #endif
 }
@@ -932,8 +936,13 @@ bool DdePoke( TDdeClientConv *dde, AnsiString Item, const wchar_t *Data )
 	bool r = false;
 	if ( hszDat ){
 		HDDEDATA hdata = DdeClientTransaction( (LPBYTE)hszDat, (DWORD)-1, (HCONV)dde->Conv, hszItem,
-		ddeFmt, XTYP_POKE, 10000, NULL);
-		r = hdata ? true : false;
+			ddeFmt, XTYP_POKE, 10000, NULL);
+		if (hdata || DdeGetLastError(ddeMgr->DdeInstId) != DMLERR_NO_ERROR){
+			r = true;
+			if (hdata)
+				DdeFreeDataHandle( hdata );
+		}
+	}
 	}
 	DdeFreeStringHandle (ddeMgr->DdeInstId, hszItem);
 	return r;
