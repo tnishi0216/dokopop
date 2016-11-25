@@ -36,7 +36,7 @@
 
 #define	DPI_DETECT			0		// DPI Detect in main (monitorごとの設定ができないためdebug用)
 
-#define	DEF_USE64			(false)
+#define	DEF_USE64			(fWow64)
 
 /*------------------------------------------*/
 /*		Definitions							*/
@@ -184,9 +184,6 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	}
 
 //	Application->OnIdle = IdleHandler;
-
-	if (fWow64)
-		tmReInit64->Enabled = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
@@ -345,6 +342,7 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 		Ini->WriteInteger(PFS_CONFIG, PFS_USE64, PopupConfigDlg->cbUse64->Checked);
 		SaveConfig();
 		SetupConfig();
+		tmReInit->Enabled = false;
 		if (!useAMODI && (CaptureMode & CM_IMAGE) && !AMODIAvail){
 			// AMODI off->ON かつ AMODIがいない場合
 			NotifyAMODI();
@@ -417,7 +415,7 @@ void __fastcall TDCHookMainForm::miConfigClick(TObject *Sender)
 void __fastcall TDCHookMainForm::miDdeTestClick(TObject *Sender)
 {
 #ifdef _DEBUG
-	DoPopup( _t("test"), NULL, false );
+	DoPopup( _t("test"), 0, NULL, false );
 #endif
 }
 //---------------------------------------------------------------------------
@@ -582,16 +580,17 @@ void __fastcall TDCHookMainForm::tmMODINotifyTimer(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-void __fastcall TDCHookMainForm::tmReInit64Timer(TObject *Sender)
+void __fastcall TDCHookMainForm::tmReInitTimer(TObject *Sender)
 {
-	// 初回起動時のみこの処理をしないとpopupしない
-	// 再ログイン時は不要
-	tmReInit64->Enabled = false;
-	Unhook();
-	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, false);
-	Ini->WriteInteger(PFS_CONFIG, PFS_USE64, !use64);
-	Hook();
-	Ini->WriteInteger(PFS_CONFIG, PFS_USE64, use64);
+	// amodi.exeのlaunchに非常に時間がかかる場合がある
+	// ex.古いPCでstartupに登録している場合
+	//    →input idleになってもmain windowの生成に時間がかかっているのかもしれない
+	// AMODIAvailがtrueになるまで初期化を続ける
+	tmReInit->Enabled = false;
+	SetupAMODI();
+	if (AMODIAvail){
+		SetupConfig2();
+	}
 }
 //---------------------------------------------------------------------------
 // Mouse Events
@@ -654,7 +653,7 @@ bool TDCHookMainForm::Hook()
 		return true;	// already loaded
 	}
 
-	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, false);
+	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, DEF_USE64);
 	hDll = new TDCHookLoader(use64);
 	if (!hDll->LoadHook(Handle)){
 		DBW("Load failed");
@@ -1007,7 +1006,8 @@ void TDCHookMainForm::ClosePdic( TDdeClientConv *dde )
 	dde->CloseLink();
 	delete dde;
 }
-bool TDCHookMainForm::DoPopup( const tchar *text, const tchar *prevtext, bool movesend )
+// click_pos: mouse clickされたtext上の文字位置(text先頭からのoffset)
+bool TDCHookMainForm::DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend )
 {
 	static int ct = 0;
 	if ( ct >= 1 ){
@@ -1114,8 +1114,20 @@ bool TDCHookMainForm::DoPopup( const tchar *text, const tchar *prevtext, bool mo
 		DdePoke( PdicDde, "PopupSearchConfig", "o1w1" );	// overlap window and no wait transaction
 		if ( prevtext && (prevtext != text) ){
 			//DBW("prevtext="FMTS,prevtext);
+#if 1
+			int len = _tcslen(prevtext);
+			tchar *buf = new tchar[len+10];
+			_itow( STR_DIFF(text, prevtext) + click_pos, buf, 10 );	// クリック位置
+			tchar *dp = buf + _tcslen(buf);
+			*dp++ = ',';
+			wcscpy( dp, prevtext );
+			DdePoke( PdicDde, "PopupSearch3", buf );
+	//		ExecuteMacro( "PopupSearch3", true );
+			delete[] buf;
+#else
 			DdePoke( PdicDde, "PopupSearch2", (tchar*)prevtext );
 	//		ExecuteMacro( "PopupSearch2", true );
+#endif
 			WaitTransaction( PdicDde );
 		} else {
 			//DBW("text="FMTS,text);
@@ -1210,7 +1222,7 @@ void TDCHookMainForm::EvPopup(TMessage &msg)
 	edPrev->Text = loc + prevstart;
 #endif
 
-	if (DoPopup( text + start, text + prevstart, movesend )){
+	if (DoPopup( text + start, loc - start, text + prevstart, movesend )){
 		// done
 		delete[] text;
 	} else {
@@ -1340,6 +1352,8 @@ void TDCHookMainForm::SetupAMODI()
 				HWND hwnd = FindAMODI();
 				if (hwnd)
 					AMODIAvail = true;
+				else
+					tmReInit->Enabled = true;	// retry later
 			}
 		}
 	}

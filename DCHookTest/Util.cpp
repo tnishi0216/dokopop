@@ -1,14 +1,15 @@
 //---------------------------------------------------------------------------
 #include <vcl.h>
 #pragma hdrstop
+#include <tchar.h>
 #include "prgconfig.h"
 #include "Util.h"
 #include "prgprof.h"
 
 //---------------------------------------------------------------------------
 const char *AppName = "DokoPop";
-const char *StrVersion = "Ver.2.0.25";
-int VersionValue = 0x020019;	// xxyyzz -> xx.yy.zz x=major y=minor(0-255) z=release(0-255)
+const char *StrVersion = "Ver.2.0.27";
+int VersionValue = 0x02001B;	// xxyyzz -> xx.yy.zz x=major y=minor(0-255) z=release(0-255)
 
 #pragma package(smart_init)
 
@@ -424,8 +425,14 @@ bool _WinExec( const char *cmd, int show, int waittime, const char *dir)
 		return false;
 	bool ret = true;
 	if ( waittime ){
+//		DWORD startTime = GetTickCount();
 		int r = WaitForInputIdle( pi.hProcess, waittime );
 		ret = r==0;
+		if (!ret){
+			dbw("CreateProcess: %d, 0x%X", r, GetLastError());
+		} else {
+//			dbw("CreateProcess: %d", GetTickCount() - startTime);
+		}
 	}
 	CloseHandle( pi.hProcess );
 	return ret;
@@ -491,11 +498,11 @@ bool LaunchAMODI()
 #else
 		SW_HIDE;
 #endif
-	if (!_WinExec( AMODI_EXE_PATH, show, 500))
+	if (!_WinExec( AMODI_EXE_PATH, show, 300))
 		return false;
 
 	HWND hwnd = NULL;
-	for (int i=0;i<30;i++){
+	for (int i=0;i<10;i++){
 		hwnd = FindAMODI();
 		if (hwnd)
 			break;

@@ -4,6 +4,9 @@ CPI=cp -i -p -u
 
 all:
 
+prep:
+	-mkdir DCHookTest\obj
+
 copy_release:
 	copy DCHook\Release\DCHook.dll DCHookTest\DKPUHK.DLL
 #	copy DCHook\Win32\Release\DCHook.dll DCHookTest\DKPUHK.DLL

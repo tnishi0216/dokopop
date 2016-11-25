@@ -1,6 +1,6 @@
 object DCHookMainForm: TDCHookMainForm
-  Left = 469
-  Top = 183
+  Left = 471
+  Top = 184
   Width = 443
   Height = 369
   Caption = 'DCHookMainForm'
@@ -2738,9 +2738,9 @@ object DCHookMainForm: TDCHookMainForm
     Left = 232
     Top = 273
   end
-  object tmReInit64: TTimer
+  object tmReInit: TTimer
     Enabled = False
-    OnTimer = tmReInit64Timer
+    OnTimer = tmReInitTimer
     Left = 280
     Top = 276
   end

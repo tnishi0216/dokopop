@@ -70,7 +70,7 @@ __published:	// IDE 管理のコンポーネント
 	TTimer *tmMODINotify;
 	TMenuItem *miCheckLatest;
 	TMenuItem *miOCRText;
-	TTimer *tmReInit64;
+	TTimer *tmReInit;
 	void __fastcall miHookClick(TObject *Sender);
 	void __fastcall miUnhookClick(TObject *Sender);
 	void __fastcall miExitClick(TObject *Sender);
@@ -106,7 +106,7 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall tmMODINotifyTimer(TObject *Sender);
 	void __fastcall miCheckLatestClick(TObject *Sender);
 	void __fastcall miOCRTextClick(TObject *Sender);
-	void __fastcall tmReInit64Timer(TObject *Sender);
+	void __fastcall tmReInitTimer(TObject *Sender);
 private:	// ユーザー宣言
 	//void __fastcall IdleHandler(TObject *sender, bool &done);
 
@@ -148,7 +148,7 @@ public:		// ユーザー宣言
 	void SetupConfig2();
 	void SetupAMODI();
 	bool EnablePopup;
-	bool DoPopup( const tchar *text, const tchar *prevtext, bool movesend );
+	bool DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend );
 	tchar *PopupText;
 	int PopupLoc;
 	bool PopupMoveSend;
