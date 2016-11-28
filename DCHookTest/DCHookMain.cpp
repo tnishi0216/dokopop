@@ -1045,7 +1045,8 @@ int TDCHookMainForm::GetPdicVersion()
 	int version = 0;
 #ifdef USE_UNICODE
 	char buf[40];
-	if (DdeRequest(PdicDde, "GetVersion", buf, sizeof(buf))){
+	int size = sizeof(buf);
+	if (DdeRequest(PdicDde, "GetVersion", buf, size)){
 		wchar_t *str = (wchar_t*)buf;
 		version = _wtoi( str ) << 24;
 		const wchar_t *p = wcschr( str, '.' );
