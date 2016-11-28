@@ -6,9 +6,12 @@ struct TDCHConfig {
 	int OnlyAMODI : 1;
 	int MoveSend : 1;
 	int OnlyImage : 1;
+	int UseNumPrev : 1;
 	int ScaleX;
 	int ScaleY;
 	char AMODIPath[_MAX_PATH];
+	unsigned char NumPrevWords;	// UseNumPrev‚ª1‚Ì‚Æ‚«‚Ì‚Ý—LŒø
+	unsigned char reserved1[3];
 };
 
 extern "C" {

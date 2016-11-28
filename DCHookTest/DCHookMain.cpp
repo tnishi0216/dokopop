@@ -1396,6 +1396,8 @@ void TDCHookMainForm::SetupConfig2()
 		cfg.ScaleX = Ini->ReadInteger(PFS_CONFIG, PFS_SCALE, 0);
 	}
 	cfg.ScaleY = cfg.ScaleX;
+	cfg.UseNumPrev = 1;
+	cfg.NumPrevWords = 2;
 	hDll->Config2(&cfg);
 }
 void TDCHookMainForm::SetupAMODI()

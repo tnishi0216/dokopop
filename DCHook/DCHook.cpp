@@ -409,6 +409,7 @@ bool ExtAMODI = false;
 int ScaleX = 0;	// 96‚ð1‚Æ‚µ‚½‰æ–Ê‚ÌŠg‘å—¦
 int ScaleY = 0;
 int generation = 0;
+int NumPrevWords = 1;	// ‰½ŒÂ‚Ü‚Å‘O‚Ì’PŒê‚ðE‚¤‚©H
 
 TCHAR ImageTextPath[256+40];	// OCR—pimage filename or text filename
 DWORD SaveImageTime;
@@ -880,13 +881,14 @@ int WINAPI Config( int clickonly, int keyaction, int keyflag )
 __declspec(dllexport)
 int WINAPI Config2( const struct TDCHConfig *cfg )
 {
-	DBW("Config2: %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseAMODI, (int)ExtAMODI);
+	DBW("Config2: %d %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseAMODI, (int)ExtAMODI, cfg->UseNumPrev ? cfg->NumPrevWords : 1);
 
 	MoveSend = cfg->MoveSend ? true : false;
 	MoveSent = false;
 	OnlyImage = cfg->OnlyImage;
 	ScaleX = cfg->ScaleX;
 	ScaleY = cfg->ScaleY;
+	NumPrevWords = cfg->UseNumPrev ? cfg->NumPrevWords : 1;
 
 	if (cfg->UseAMODI){
 		if (!ExtAMODI){
@@ -2720,11 +2722,11 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 			SYSTEMTIME t;
 			GetLocalTime(&t);
 			if (ExtAMODI){
-				wsprintf(path+len, /*path_size-len,*/ _T("\\%04d-%02d-%02d-%02d%02d%02d-(%d,%d).bmp"),
-					t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, ptCursor.x, ptCursor.y);
+				wsprintf(path+len, /*path_size-len,*/ _T("\\%04d-%02d-%02d-%02d%02d%02d-(%d,%d)-n%d.bmp"),
+					t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, ptCursor.x, ptCursor.y, NumPrevWords );
 			} else {
-				wsprintf(path+len, /*path_size-len,*/ _T("\\amodi\\%04d-%02d-%02d-%02d%02d%02d.bmp"),
-					t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond);
+				wsprintf(path+len, /*path_size-len,*/ _T("\\amodi\\%04d-%02d-%02d-%02d%02d%02d-n%d.bmp"),
+					t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, NumPrevWords );
 				SendAMODI(WMCD_SETPOINT, (char*)&ptCursor, sizeof(ptCursor));
 			}
 			HANDLE fh = CreateFile(path,  GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);

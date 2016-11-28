@@ -146,6 +146,7 @@ namespace amodi
                 MODI.Layout layout = image.Layout;
 				bool outok = capture_page;
 				string prevWord = "";
+				string prevWord2 = "";
 				for (int j = 0; j < layout.Words.Count; j++)
                 {
                     MODI.Word word = (MODI.Word)layout.Words[j];
@@ -164,25 +165,23 @@ namespace amodi
                             //incursor = true;
 							if (!outok)
 							{
-                                if (CursorPoint.X < rc.Left) {
-                                    // cursorを飛び越えた
+                                if (CursorPoint.X < rc.Left	// cursorを飛び越えた
+                                	|| (CursorPoint.X >= rc.Left && CursorPoint.X <= rc.Right)	// cursorが矩形内
+                                	){
                                     outok = true;
 									curLocSet = true;
-                                    if (prevWord.Length != 0) {
-                                        tbText.AppendText(prevWord + " ");
-                                        CurLoc = prevWord.Length + 1;
-                                    }
-                                } else
-									if (CursorPoint.X >= rc.Left && CursorPoint.X <= rc.Right){
-										outok = true;
-										curLocSet = true;
-                                        if (prevWord.Length != 0) {
-                                            tbText.AppendText(prevWord + " ");
-                                            CurLoc = prevWord.Length + 1;
-                                        }
-									} else {
-										prevWord = word.Text;
-									}
+	                                if (prevWord.Length != 0) {
+										if (NumPrevWords >= 2 && prevWord2.Length != 0){
+											tbText.AppendText(prevWord2 + " " + prevWord + " ");
+										} else {
+		                                    tbText.AppendText(prevWord + " ");
+		                                }
+	                                    CurLoc = prevWord.Length + 1;
+	                                }
+                                } else {
+									prevWord2 = prevWord;
+									prevWord = word.Text;
+								}
 							}
                         } else {
                             //incursor = false;
@@ -224,6 +223,12 @@ namespace amodi
 			{
 				CursorPoint.X = int.Parse(m.Groups["x"].Value);
 				CursorPoint.Y = int.Parse(m.Groups["y"].Value);
+			}
+			r = new Regex(@"-n(?<n>\d+)");
+			m = r.Match(filename);
+			if (m.Success)
+			{
+				NumPrevWords = int.Parse(m.Groups["n"].Value);
 			}
 		}
 
@@ -307,6 +312,7 @@ namespace amodi
             p.Y = pt.y;
             return p;
         }
+        int NumPrevWords = 1;
         // interface for external app
         protected override void WndProc(ref Message m)
         {
