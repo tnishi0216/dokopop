@@ -36,13 +36,27 @@ Windows Device Driver Kit (DDK) for Windows 98
 作成方法 -----------------------------------------------------------------
 
 --------------------------------
-dchook.dll
+dchook.dll, dchook64.dll
 --------------------------------
 必要な環境：
-Visual C++
+Visual C++ 2008
 
 作成方法：
+DCHook.6.0.slnを開き、ビルド
+
+または
+
 nmake -fdchook.mak
+
+--------------------------------
+DCHook64.exe
+--------------------------------
+必要な環境：
+Visual C++ 2010
+
+作成方法：
+dchk64.slnを開く
+ビルド - 構成マネージャーよりアクティブソリューションプラットフォームを x64 に切り替える
 
 --------------------------------
 hk95d.vxd
@@ -73,14 +87,8 @@ C++ Builder 5
 ※DEBUGをdefineすると、DEBUG用の動作になります。
 
 作成方法：
-dchooktest.bprをC++Builderで開いてください。
-C++Builder4でもできるかも、と思って C++Builder4以前用に
-dchooktest.makも添付してあります。多少の変更で使えるかもしれません。
-
-あとは、メニューから Project | 再構築 で作成します。
-
-実行：
-dchooktest.exeを実行します。
+dchooktest.bprをC++Builderで開く
+メニューから Project | 再構築 で作成
 
 ★注意点：
 DCHookTest.exeがLoadするDLLは、
