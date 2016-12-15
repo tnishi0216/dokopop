@@ -2798,6 +2798,7 @@ bool WaitAndGetResult(const TCHAR *path, unsigned waittime)
 							if (col==0){
 								loc = _wtoi(p);
 								col++;
+								while (iswdigit(*p)) p++;
 							}
 						}
 
