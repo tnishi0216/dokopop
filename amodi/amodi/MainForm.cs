@@ -173,10 +173,11 @@ namespace amodi
 	                                if (prevWord.Length != 0) {
 										if (NumPrevWords >= 2 && prevWord2.Length != 0){
 											tbText.AppendText(prevWord2 + " " + prevWord + " ");
+                                            CurLoc = prevWord2.Length + 1 + prevWord.Length + 1;
 										} else {
 		                                    tbText.AppendText(prevWord + " ");
-		                                }
-	                                    CurLoc = prevWord.Length + 1;
+                                            CurLoc = prevWord.Length + 1;
+                                        }
 	                                }
                                 } else {
 									prevWord2 = prevWord;
