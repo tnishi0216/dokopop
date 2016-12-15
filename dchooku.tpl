@@ -3,20 +3,20 @@
  DCHOOK/Unicode Document Template
 ------------------------------------------------------------------------
 %NEWMAJOR=2
-%NEWMINOR=0
-%NEWRELEASE=27
+%NEWMINOR=1
+%NEWRELEASE=0
 %POST=
 %OLDMAJOR=2
-%OLDMINOR=0
-%OLDRELEASE=26
+%OLDMINOR=1
+%OLDRELEASE=0
 %OLDPOST=
 
 %DATE_Y=16		公開日
-%DATE_M=11
-%DATE_D=19
+%DATE_M=12
+%DATE_D=15
 
 %TIME_H=02
-%TIME_M=00
+%TIME_M=01
 %TIME_S=00
 
 %DATE_YY=20%DATE_Y%
@@ -53,6 +53,9 @@
 ******************** DokoPop! の変更履歴 ****************************
 ##<*HISTORY.TXT
 ##>UPDATE.TXT
+
+>> Ver.2.1 <<
+  ・二語前の単語を含めた連語のヒット対応（要：PDIC/Unicode Ver.5.10.24以上)
 
 >> Ver.2.00 <<
   ・文字認識により、ポップアップ検索ができるところが増えた

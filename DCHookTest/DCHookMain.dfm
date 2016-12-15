@@ -1,6 +1,6 @@
 object DCHookMainForm: TDCHookMainForm
-  Left = 471
-  Top = 184
+  Left = 473
+  Top = 186
   Width = 443
   Height = 369
   Caption = 'DCHookMainForm'

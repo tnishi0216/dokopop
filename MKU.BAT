@@ -17,10 +17,10 @@ pause
 
 make copy_bin
 
-rem touch -d11/19/16 -t02:00:00 -c ind\DKPU.EXE ind\DKPUHK.DLL
+rem touch -d12/15/16 -t02:01:00 -c ind\DKPU.EXE ind\DKPUHK.DLL
 
 rem dkpu.issの更新
-perl change_iss.pl ind\dkpu.iss Setup AppVerName "DokoPop! 2.027" > ind\dkpu.iss.new
+perl change_iss.pl ind\dkpu.iss Setup AppVerName "DokoPop! 2.10" > ind\dkpu.iss.new
 del ind\dkpu.iss.old
 ren ind\dkpu.iss dkpu.iss.old
 ren ind\dkpu.iss.new dkpu.iss
@@ -33,12 +33,12 @@ echo Press Enter key after installer made.
 echo/
 pause
 
-copy ind\Output\setup.EXE DKPU2027.exe
-dir DKPU2027.exe
+copy ind\Output\setup.EXE DKPU210.exe
+dir DKPU210.exe
 
-rem lha32 a DKPU2027.exe DKPU.TXT DKPU.EXE DKPUHK.DLL
-ren DKPU2027.exe DKPU2027.exe
-rem touch -d11/19/16 -t02:00:00 -c DKPU2027.exe
+rem lha32 a DKPU210.exe DKPU.TXT DKPU.EXE DKPUHK.DLL
+ren DKPU210.exe DKPU210.exe
+rem touch -d12/15/16 -t02:01:00 -c DKPU210.exe
 
 echo/
 echo ソースファイルをzipします
@@ -46,8 +46,8 @@ echo/
 pause
 
 make zip_src
-copy src.zip src-2.027.zip
-rem copy src-2.027.zip zip
+copy src.zip src-2.10.zip
+rem copy src-2.10.zip zip
 
 echo/
 echo 公開用ファイルを更新します
@@ -62,13 +62,13 @@ echo Web用のファイルを更新します
 echo/
 pause
 
-rem copy DKPU2027.exe S:\Web\NIFTY\
-rem del S:\Web\NIFTY\DKPU2026.EXE
-copy DKPU2027.exe S:\web\sakura-pdic\cgi-bin\download\files\
-del S:\web\sakura-pdic\cgi-bin\download\files\DKPU2026.EXE
+rem copy DKPU210.exe S:\Web\NIFTY\
+rem del S:\Web\NIFTY\DKPU210.EXE
+copy DKPU210.exe S:\web\sakura-pdic\cgi-bin\download\files\
+del S:\web\sakura-pdic\cgi-bin\download\files\DKPU210.EXE
 
 rem echo [del] >> S:\Web\NIFTY\ftp.ctl
-rem echo DKPU2026.EXE >> S:\Web\NIFTY\ftp.ctl
+rem echo DKPU210.EXE >> S:\Web\NIFTY\ftp.ctl
 rem echo [include] >> S:\Web\NIFTY\ftp.ctl
-rem echo DKPU2027.exe >> S:\Web\NIFTY\ftp.ctl
+rem echo DKPU210.exe >> S:\Web\NIFTY\ftp.ctl
 
