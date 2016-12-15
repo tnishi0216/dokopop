@@ -88,7 +88,7 @@ rescan:
 				wordprev2 = wordprev;
 				wordprev = wordtop;
 				wordtop = p;
-				fSpc = FALSE;
+				fSpc = false;
 			}
 		}
 		if ( alnum ){
@@ -115,7 +115,7 @@ rescan:
 					fSpc = true;
 				}
 			} else {
-				fSpc = FALSE;
+				fSpc = false;
 			}
 			if ( alnum ){
 				p = NEXT_CHAR( p );
