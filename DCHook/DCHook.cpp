@@ -313,6 +313,7 @@ char VxDpathName[256];	// HK95.vxd path
 DWORD siPageSize = 0;
 HWND hwndOrg = NULL;
 HWND hwndAMODI = NULL;
+bool RequireHwndAMODI = false;
 bool OnlyAMODI = false;
 bool tryAMODI = false;
 bool MoveSend = false;
@@ -890,8 +891,11 @@ int WINAPI Config2( const struct TDCHConfig *cfg )
 	ScaleY = cfg->ScaleY;
 	NumPrevWords = cfg->UseNumPrev ? cfg->NumPrevWords : 1;
 
+	RequireHwndAMODI = false;
+
 	if (cfg->UseAMODI){
 		if (!ExtAMODI){
+			RequireHwndAMODI = true;
 			if (!hwndAMODI)
 				hwndAMODI = FindAMODI();
 		}
@@ -1195,6 +1199,21 @@ bool DoCapture(HWND hwnd, POINT pt, bool movesend, bool image_only, bool runOnLa
 	DBW("DoCapture: %d %d %d %d %d", image_only, runOnLaunchedProc, hwndAMODI, ExtAMODI, OnlyAMODI);
 	CursorPoint = ScreenPoint = pt;
 	ScreenToClient( hwnd, &CursorPoint );
+
+#if 1	// acrobat reader上でclickするとhwndAMODIがnullになってしまう場合があるため（原因不明）
+		// ・reader上ではmouse eventがピタッと止まる
+		// ・reader上でclickしただけではnullにならない
+		// ・reader上でctrl+clickすると、reader上からmouseを外すとnullになっている
+		// ・reader上でshift+click, alt+click, ctrl+clickではnullにならない
+		// ・設定をAlt+clickに変更すると、Alt+clickでnullになり、Ctrl+clickではnullにならない
+		// まるでDokoPop!対策をしているかのようだ。いずれにせよ、mouse eventがまったく来ない、
+		// おそらくreaderのほうでmouse hookを呼ばないようにしているのだろう、
+		// なので、null原因が仮にわかったとしても、reader上では検索ができないはず
+	if (RequireHwndAMODI){
+		if (!hwndAMODI)
+			hwndAMODI = FindAMODI();
+	}
+#endif
 
 	if (!image_only && !runOnLaunchedProc){
 		//DBW("hwnd:%08X %d %d", (int)hwnd, CursorPoint.x, CursorPoint.y);
