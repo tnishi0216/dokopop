@@ -8,8 +8,8 @@
 
 //---------------------------------------------------------------------------
 const char *AppName = "DokoPop";
-const char *StrVersion = "Ver.2.1.1";
-int VersionValue = 0x020101;	// xxyyzz -> xx.yy.zz x=major y=minor(0-255) z=release(0-255)
+const char *StrVersion = "Ver.2.1.2";
+int VersionValue = 0x020102;	// xxyyzz -> xx.yy.zz x=major y=minor(0-255) z=release(0-255)
 
 #pragma package(smart_init)
 

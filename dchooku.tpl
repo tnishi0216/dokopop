@@ -4,20 +4,20 @@
 ------------------------------------------------------------------------
 %NEWMAJOR=2
 %NEWMINOR=1
-%NEWRELEASE=1
+%NEWRELEASE=2
 %POST=
 %OLDMAJOR=2
 %OLDMINOR=1
-%OLDRELEASE=0
+%OLDRELEASE=1
 %OLDPOST=
 
-%DATE_Y=16		公開日
-%DATE_M=12
-%DATE_D=15
+%DATE_Y=17		公開日
+%DATE_M=11
+%DATE_D=05
 
 %TIME_H=02
 %TIME_M=01
-%TIME_S=00
+%TIME_S=02
 
 %DATE_YY=20%DATE_Y%
 %VERSION = %NEWMAJOR%.%NEWMINOR%.%NEWRELEASE%%POST%
@@ -306,7 +306,7 @@ echo 完全版パッケージを作成します
 echo/
 echo ■確認事項
 echo ・./dchooktest/dchooktest.exeを準備(USE_UNICODE defined)
-echo ・バージョン番号：.bprとUtil.cpp(StrVersion, VersionValue)の両方が必要
+echo ・バージョン番号：.bpr、Util.cpp(StrVersion, VersionValue)と.tplが必要
 echo ・Release Build?
 echo ・VisualStudio2008でbuildしたか？ for W2K
 pause

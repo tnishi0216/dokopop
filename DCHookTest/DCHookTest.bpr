@@ -51,7 +51,7 @@ IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=2
 MinorVer=1
-Release=1
+Release=2
 Build=81
 Debug=0
 PreRelease=0
@@ -64,7 +64,7 @@ CodePage=932
 [Version Info Keys]
 CompanyName=Doko Pop Project
 FileDescription=DokoPop for Windows
-FileVersion=2.1.1.81
+FileVersion=2.1.2.81
 InternalName=DokoPop
 LegalCopyright=Copyright (c) DokoPopProject
 LegalTrademarks=
