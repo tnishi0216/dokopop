@@ -4,20 +4,20 @@
 ------------------------------------------------------------------------
 %NEWMAJOR=2
 %NEWMINOR=1
-%NEWRELEASE=2
+%NEWRELEASE=3
 %POST=
 %OLDMAJOR=2
 %OLDMINOR=1
-%OLDRELEASE=1
+%OLDRELEASE=2
 %OLDPOST=
 
-%DATE_Y=17		ŒöŠJ“ú
-%DATE_M=11
-%DATE_D=05
+%DATE_Y=18		ŒöŠJ“ú
+%DATE_M=03
+%DATE_D=21
 
 %TIME_H=02
 %TIME_M=01
-%TIME_S=02
+%TIME_S=03
 
 %DATE_YY=20%DATE_Y%
 %VERSION = %NEWMAJOR%.%NEWMINOR%.%NEWRELEASE%%POST%
