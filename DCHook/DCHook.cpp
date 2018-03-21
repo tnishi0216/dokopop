@@ -36,7 +36,7 @@
 // Configuration //
 #define	USE_SCALING		1	// Uses DPI scaling
 
-#define	USE_DBW			1	// DBWを使用する
+#define	USE_DBW			0	// DBWを使用する
 #define	USE_SHARE0		1	// shareしても問題ない変数
 
 #define	METAEXTTEXTOUT	1	// MetaMethodでExtTextOutxをhookする
