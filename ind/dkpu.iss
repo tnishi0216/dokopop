@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=DokoPop! (Unicode)
-AppVerName=DokoPop! 2.1.3
+AppVerName=DokoPop! 2.1.4
 AppPublisher=DokoPop Project
 DefaultDirName={pf}\DokoPop! (Unicode)
 DefaultGroupName=DokoPop! (Unicode)
@@ -12,6 +12,7 @@ InfoBeforeFile=DKPU.TXT
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
+UninstallDisplayIcon={app}\DKPu.exe
 
 [Languages]
 ;Name: "english"; MessagesFile: "compiler:Default.isl"
