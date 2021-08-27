@@ -35,6 +35,7 @@ void Cleanup();
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int atox( const TCHAR *str, TCHAR **next );
+void SetDpiAware();
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -46,6 +47,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 
 	MSG msg;
 	HACCEL hAccelTable;
+
+	SetDpiAware();
 
 	// グローバル文字列を初期化しています。
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -334,3 +337,21 @@ HANDLE WinExecEx( const char *cmd, int show, const char *dir, const char *title 
 		return NULL;
 	return pi.hProcess;
 }
+
+typedef WINUSERAPI BOOL (WINAPI *FNSetProcessDpiAwarenessContext)(UINT_PTR vaule);
+#define	DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2	((UINT_PTR)-4)
+void SetDpiAware()
+{
+	HINSTANCE hDll = LoadLibrary( _T("user32") );
+	if (!hDll)
+		return;
+	FNSetProcessDpiAwarenessContext fnSetProcessDpiAwarenessContext = (FNSetProcessDpiAwarenessContext)GetProcAddress(hDll, "SetProcessDpiAwarenessContext");
+	if (fnSetProcessDpiAwarenessContext){
+		if (fnSetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)){
+		} else {
+			DBW("x64-SetDpiAware failed: %d", GetLastError());
+		}
+	}
+	FreeLibrary(hDll);
+}
+

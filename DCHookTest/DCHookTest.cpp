@@ -23,8 +23,11 @@ USEUNIT("MonitorScale.cpp");
 #include "DCHookMain.h"
 //---------------------------------------------------------------------------
 
+void SetDpiAware();
+
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
+	SetDpiAware();
 #if __PROTO
 	SYSTEMTIME st;
 	GetSystemTime(&st);
@@ -64,5 +67,22 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	return 0;
 }
 //---------------------------------------------------------------------------
+
+typedef WINUSERAPI BOOL (WINAPI *FNSetProcessDpiAwarenessContext)(UINT_PTR vaule);
+#define	DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2	((UINT_PTR)-4)
+void SetDpiAware()
+{
+	HINSTANCE hDll = LoadLibrary( _T("user32") );
+	if (!hDll)
+		return;
+	FNSetProcessDpiAwarenessContext fnSetProcessDpiAwarenessContext = (FNSetProcessDpiAwarenessContext)GetProcAddress(hDll, "SetProcessDpiAwarenessContext");
+	if (fnSetProcessDpiAwarenessContext){
+		if (fnSetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)){
+		} else {
+			DBW("SetDpiAware failed: %d", GetLastError());
+		}
+	}
+	FreeLibrary(hDll);
+}
 
 
