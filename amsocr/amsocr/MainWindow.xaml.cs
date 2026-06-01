@@ -182,12 +182,12 @@ namespace amsocr
 
             ParseFileName(filename);
 
-            lbStatus.Text = "Recognizing... " + filename;
+            lbStatus.Content = "Recognizing... " + filename;
+#if false
             tbText.Text = "";
             tbInfo.Text = "";
 
             DBW("DoOCR:OCR");
-#if false
             try
             {
                 //TODO: default languageは何？

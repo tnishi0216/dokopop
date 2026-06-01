@@ -22,11 +22,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <!--  ヘッダー  -->
+        <Label Name="lbStatus" Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center" Width="768" Height="30"/>
         <Label
-            x:Name="lblPath"
+            x:Name="lbPath"
             Grid.Row="1"
             Width="92"
-            Margin="10,18,0,0"
+            Margin="0,7,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             HorizontalContentAlignment="Right"
@@ -34,7 +35,7 @@
         <TextBox
             x:Name="txtPath"
             Grid.Row="1"
-            Margin="110,5,175,0"
+            Margin="102,11,183,0"
             VerticalAlignment="Top"
             />
         <Button
@@ -65,15 +66,13 @@
         <TextBox
             Name="txtOcrResult"
             Grid.Row="2"
-            Margin="10,255,10,10"
-            VerticalAlignment="Bottom"
+            Margin="10,272,10,0"
+            VerticalAlignment="Top"
             
             AcceptsReturn="True"
             IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
             
             TextWrapping="Wrap"
             VerticalScrollBarVisibility="Auto" />
-
-
     </Grid>
 </Window>
