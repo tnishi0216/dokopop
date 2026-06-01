@@ -6,6 +6,15 @@
         xmlns:local="clr-namespace:amsocr"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <!-- 右クリック用コンテキストメニューを追加 -->
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem x:Name="miCapturePage" Header="Capture Page" IsCheckable="True" />
+            <MenuItem x:Name="miUseDefLang" Header="Use Default Language" IsCheckable="True" />
+            <Separator />
+            <MenuItem x:Name="miDebugMode" Header="Debug Mode" IsCheckable="True" />
+        </ContextMenu>
+    </Window.ContextMenu>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50" />

@@ -161,7 +161,6 @@ namespace amsocr
             fsw = new System.IO.FileSystemWatcher();
             fsw.Path = exepath;
             fsw.IncludeSubdirectories = false;
-            fsw.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke?)this;
             fsw.Changed += new System.IO.FileSystemEventHandler(watcher_Changed);
             fsw.EnableRaisingEvents = true;
 
@@ -179,8 +178,7 @@ namespace amsocr
             if (DoingOCR) return false;
             DoingOCR = true;
 
-#if false
-            bool capture_page = miCapturePage.Checked;
+            bool capture_page = (miCapturePage?.IsChecked ?? false);
 
             ParseFileName(filename);
 
@@ -189,6 +187,7 @@ namespace amsocr
             tbInfo.Text = "";
 
             DBW("DoOCR:OCR");
+#if false
             try
             {
                 //TODO: default languageは何？
@@ -328,29 +327,23 @@ namespace amsocr
         }
 
         //イベントハンドラ
-        private void watcher_Changed(System.Object source,
-            System.IO.FileSystemEventArgs e)
+        private void watcher_Changed(object source, System.IO.FileSystemEventArgs e)
         {
-            switch (e.ChangeType)
-            {
-                case System.IO.WatcherChangeTypes.Changed:
-                    string ext = System.IO.Path.GetExtension(e.FullPath);
-                    if (ext == ".gif" || ext == ".jpg" || ext == ".png" || ext == ".tif" || ext == ".bmp" || ext == ".dib")
-                    {
-                        PostOCR(e.FullPath);
-                    }
-                    break;
-                    //                case System.IO.WatcherChangeTypes.Created:
-                    //break;
-                    //                case System.IO.WatcherChangeTypes.Deleted:
-                    //                  break;
-            }
+            Dispatcher.BeginInvoke(new Action(() => {
+                string ext = System.IO.Path.GetExtension(e.FullPath);
+                if (ext == ".gif" || ext == ".jpg" || ext == ".png" || ext == ".tif" || ext == ".bmp" || ext == ".dib")
+                {
+                    PostOCR(e.FullPath);
+                }
+            }));
         }
 
         private void PostOCR(string filename)
         {
             FileNameQue.Enqueue(filename);
+#if false //TODO:
             PostMessage(this.Handle, WM_EXEC_OCR, IntPtr.Zero, IntPtr.Zero);
+#endif
         }
 
         private void ExecOCR(string filename)
@@ -364,19 +357,23 @@ namespace amsocr
                     {
                         StreamWriter writer = new StreamWriter(textname, false, System.Text.Encoding.GetEncoding("utf-16"));
                         writer.WriteLine(CurLoc.ToString());
+#if false //TODO:
                         writer.Write(tbText.Text);
+#endif
                         writer.Close();
                     }
                     catch
                     {
+#if false //TODO:
                         tbInfo.AppendText("Write Error:" + textname + "\r\n");
+#endif
                         System.Threading.Thread.Sleep(30);
                         continue;
                     }
                     break;
                 }
             }
-            if (!miDebugMode.Checked)
+            if (!(miDebugMode?.IsChecked ?? false))
             {
                 try
                 {
@@ -384,8 +381,10 @@ namespace amsocr
                 }
                 catch
                 {
+#if false //TODO:
                     // 連続して.bmpファイルが作られているため
                     tbInfo.AppendText("Delete Error:" + filename + "\r\n");
+#endif
                 }
             }
         }
@@ -401,6 +400,7 @@ namespace amsocr
             public int y;
         };
         Point CursorPoint;
+#if false
         unsafe static Point int2point(IntPtr param)
         {
             POINT pt = (POINT)Marshal.PtrToStructure((IntPtr)param, typeof(POINT));
@@ -409,6 +409,7 @@ namespace amsocr
             p.Y = pt.y;
             return p;
         }
+#endif
         int NumPrevWords = 1;
 
         //TODO: event handler
