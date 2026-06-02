@@ -127,11 +127,13 @@ namespace amsocr
             public IntPtr lpData;
         }
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct COPYDATASTRUCT_send
         {
-            public Int32 dwData;        //送信する32ビット値
-            public Int32 cbData;　　　　//lpDataのバイト数
-            public string lpData;　　 //送信するデータへのポインタ(0も可能)
+            public IntPtr dwData;        //送信する32ビット値
+            public int cbData;           //lpDataのバイト数
+            [MarshalAs(UnmanagedType.LPStr)]
+            public string lpData;        //送信するデータへのポインタ(0も可能)
         }
 
         [DllImport("user32.dll", SetLastError = true)]
@@ -449,7 +451,7 @@ namespace amsocr
             byte[] bytearray = System.Text.Encoding.Default.GetBytes(msg);
             int len = bytearray.Length;
             COPYDATASTRUCT_send cds;
-            cds.dwData = 1; // Indicate String
+            cds.dwData = (IntPtr)1; // Indicate String
             cds.cbData = len + 1;
             cds.lpData = msg;
             SendMessage((IntPtr)hWin, WM_COPYDATA, IntPtr.Zero, ref cds);
