@@ -71,6 +71,37 @@ namespace amsocr
             return path;
         }
 
+        private string SelectJpgFromDirectory()
+        {
+            string directory = "c:\\temp\\amsocr";
+            
+            try
+            {
+                if (!System.IO.Directory.Exists(directory))
+                {
+                    MessageBox.Show("Directory not found: " + directory);
+                    return "";
+                }
+
+                var jpgFiles = System.IO.Directory.GetFiles(directory, "*.jpg");
+
+                if (jpgFiles.Length == 0)
+                {
+                    MessageBox.Show("No JPG files found in " + directory);
+                    return "";
+                }
+
+                // 最初に見つかったファイルを返す
+                return jpgFiles[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+            return "";
+        }
+
         private async void btnOcr_Click(object sender, RoutedEventArgs e)
         {
             //OCRの実行処理
@@ -78,8 +109,11 @@ namespace amsocr
                 var sbitmap = await ConvertSoftwareBitmap(ImgTarget);
                 txtOcrResult.Text = (await RunOcr(sbitmap)).Text;
             } else {
-                string imgpath = "c:\\temp\\test.jpg";
-                await DoOCR(imgpath);
+                string imgpath = SelectJpgFromDirectory();
+                if (imgpath != "")
+                {
+                    await DoOCR(imgpath);
+                }
             }
         }
         private async Task<SoftwareBitmap> ConvertSoftwareBitmap(System.Windows.Controls.Image image)
@@ -187,7 +221,6 @@ namespace amsocr
             //OCRの実行処理
             var sbitmap = await ConvertSoftwareBitmap(ImgTarget);
             OcrEngine engine;
-            //TODO: default languageは何？
             if (miUseDefLang?.IsChecked ?? false)
             {
                 string language = "ja-JP";
@@ -195,9 +228,9 @@ namespace amsocr
             }
             else
             {
+                //OCRを実行する
                 engine = OcrEngine.TryCreateFromUserProfileLanguages();
             }
-            //OCRを実行する(Default Language)
             return await engine.RecognizeAsync(sbitmap);
         }
         async Task<bool> DoOCR(string filename)
@@ -256,12 +289,12 @@ namespace amsocr
                     bool cr = false;
                     bool curLocSet = false;
 
-                    // for (int k = 0; k < word.Rects.Count; k++)
                     {
-                        // MODI.MiRect rc = (MODI.MiRect)word.Rects[k];
                         var rect = word.BoundingRect;
                         int h = (int)rect.Height;
                         int w = (int)rect.Width;
+
+                        // DBW("Word:" + word.Text + " (" + w + "x" + h + ":" + rect.Left + "," + rect.Top + ")");
 
                         //bool incursor;
                         //tbText.AppendText(word.Text + " (" + rc.Left + "," + rc.Top+ ")\r\n");
