@@ -246,9 +246,8 @@ namespace amsocr
             CurLoc = 0;
             lbPoint.Content = "" + CursorPoint.X + "," + CursorPoint.Y;
             tbInfo.AppendText("Page:" + ocrResult.Lines.Count + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
-            for (int i = 0; i < ocrResult.Lines.Count; i++)
+            foreach (var line in ocrResult.Lines)
             {
-                var line = ocrResult.Lines[i];
                 bool outok = capture_page;
                 string prevWord = "";
                 string prevWord2 = "";
