@@ -17,48 +17,58 @@
     </Window.ContextMenu>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="55" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="66" />
+            <RowDefinition Height="39" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <!--  ヘッダー  -->
-        <Label Name="lbStatus" Content="Label" HorizontalAlignment="Center" VerticalAlignment="Center" Width="768" Height="30"/>
+        <Label Name="lbPoint" Content="(Point)" HorizontalAlignment="Left" VerticalAlignment="Top" Width="60" Height="25" Margin="102,0,0,0"/>
+        <Label Name="lbStatus" Content="(Status)" HorizontalAlignment="Left" VerticalAlignment="Top" Width="611" Height="25" Margin="167,0,0,0"/>
+        <TextBox x:Name="tbInfo"
+                 Text="(Information)"
+           DockPanel.Dock="Bottom"
+           IsReadOnly="True"
+           AcceptsReturn="True"
+           TextWrapping="Wrap"
+           VerticalScrollBarVisibility="Auto"
+           Margin="102,25,6,0"
+           FontFamily="Consolas"
+           FontSize="12"/>
         <Label
             x:Name="lbPath"
             Grid.Row="1"
             Width="92"
-            Margin="0,7,0,0"
             HorizontalAlignment="Left"
-            VerticalAlignment="Top"
+            VerticalAlignment="Center"
             HorizontalContentAlignment="Right"
-            Content="ファイルパス：" />
+            Content="ファイルパス：" Height="26" />
         <TextBox
             x:Name="txtPath"
             Grid.Row="1"
-            Margin="102,11,183,0"
-            VerticalAlignment="Top"
+            Margin="102,0,183,0"
+            VerticalAlignment="Center" Height="18"
             />
         <Button
             Name="btnPath"
             Grid.Row="1"
             Width="70"
-            Margin="0,10,100,0"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
+            Margin="630,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
             Click="btnPath_Click"
             Content="参照..."
-            FontSize="12"
+            FontSize="12" Height="20"
             />
         <Button
             Name="btnOcr"
             Grid.Row="1"
             Width="85"
-            Margin="0,10,10,0"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
+            Margin="705,0,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
             Click="btnOcr_Click"
             Content="OCR実行"
-            FontSize="12" />
+            FontSize="12" Height="20" />
         <Image
             x:Name="ImgTarget"
             Grid.Row="2"
@@ -66,13 +76,13 @@
         <TextBox
             Name="txtOcrResult"
             Grid.Row="2"
-            Margin="10,272,10,0"
+            Margin="10,238,10,0"
             VerticalAlignment="Top"
             
             AcceptsReturn="True"
             IsEnabled="{Binding Path=IsChecked, ElementName=MaterialDesignOutlinedTextBoxEnabledComboBox}"
             
             TextWrapping="Wrap"
-            VerticalScrollBarVisibility="Auto" />
+            VerticalScrollBarVisibility="Auto" Height="81" />
     </Grid>
 </Window>
