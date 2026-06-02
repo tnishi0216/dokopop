@@ -113,7 +113,8 @@ namespace amsocr
                 string imgpath = SelectJpgFromDirectory();
                 if (imgpath != "")
                 {
-                    await DoOCR(imgpath);
+                    var ocrText = await DoOCR(imgpath);
+                    txtOcrResult.AppendText(ocrText);
                 }
             }
         }
@@ -234,9 +235,9 @@ namespace amsocr
             }
             return await engine.RecognizeAsync(sbitmap);
         }
-        async Task<bool> DoOCR(string filename)
+        async Task<String> DoOCR(string filename)
         {
-            if (DoingOCR) return false;
+            if (DoingOCR) return "";
             DoingOCR = true;
 
             bool capture_page = (miCapturePage?.IsChecked ?? false);
@@ -271,7 +272,7 @@ namespace amsocr
                 DBW("DoOCR:Closed");
                 lbStatus.Content = "OCR Error: " + filename;
                 DoingOCR = false;
-                return false;
+                return "";
             }
             DBW("DoOCR:Completed");
             const int UnderGap = MARGIN_UNDER_CLICK; // 単語のある領域より少し下のpointでも検索対象と認識する空白部分(Y方向)
@@ -364,10 +365,9 @@ namespace amsocr
                     }
                 }
             }
-            txtOcrResult.AppendText(ocrText);
             lbStatus.Content = "Done. " + filename;
             DoingOCR = false;
-            return true;
+            return ocrText;
         }
         // (x,y)-n\d*.jpg x,y: click座標 n: clickn語前の単語(def.=1)
         private void ParseFileName(string filename)
@@ -402,15 +402,14 @@ namespace amsocr
         private void PostOCR(string filename)
         {
             FileNameQue.Enqueue(filename);
-#if false //TODO:
-            PostMessage(this.Handle, WM_EXEC_OCR, IntPtr.Zero, IntPtr.Zero);
-#endif
+            var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            PostMessage(hwnd, WM_EXEC_OCR, IntPtr.Zero, IntPtr.Zero);
         }
 
         private void ExecOCR(string filename)
         {
             var result = DoOCR(filename);
-            if (result.Result)
+            if (result.Result != "")
             {
                 string textname = filename + ".txt";
                 for (int i = 0; i < 10; i++)
@@ -419,16 +418,12 @@ namespace amsocr
                     {
                         StreamWriter writer = new StreamWriter(textname, false, System.Text.Encoding.GetEncoding("utf-16"));
                         writer.WriteLine(CurLoc.ToString());
-#if false //TODO:
-                        writer.Write(tbText.Text);
-#endif
+                        writer.Write(result.Result);
                         writer.Close();
                     }
                     catch
                     {
-#if false //TODO:
                         tbInfo.AppendText("Write Error:" + textname + "\r\n");
-#endif
                         System.Threading.Thread.Sleep(30);
                         continue;
                     }
@@ -443,10 +438,8 @@ namespace amsocr
                 }
                 catch
                 {
-#if false //TODO:
                     // 連続して.bmpファイルが作られているため
                     tbInfo.AppendText("Delete Error:" + filename + "\r\n");
-#endif
                 }
             }
         }
