@@ -109,6 +109,7 @@ namespace amsocr
                 var sbitmap = await ConvertSoftwareBitmap(ImgTarget);
                 txtOcrResult.Text = (await RunOcr(sbitmap)).Text;
             } else {
+                // ファイルを指定しない場合は、C:\temp\amsocr\*.jpgから任意のファイルを自動選択
                 string imgpath = SelectJpgFromDirectory();
                 if (imgpath != "")
                 {
@@ -279,6 +280,7 @@ namespace amsocr
             CurLoc = 0;
             lbPoint.Content = "" + CursorPoint.X + "," + CursorPoint.Y;
             tbInfo.AppendText("Page:" + ocrResult.Lines.Count + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
+            String ocrText = "";
             foreach (var line in ocrResult.Lines)
             {
                 bool outok = capture_page;
@@ -313,12 +315,12 @@ namespace amsocr
                                     {
                                         if (NumPrevWords >= 2 && prevWord2.Length != 0)
                                         {
-                                            txtOcrResult.AppendText(prevWord2 + " " + prevWord + " ");
+                                            ocrText += prevWord2 + " " + prevWord + " ";
                                             CurLoc = prevWord2.Length + 1 + prevWord.Length + 1;
                                         }
                                         else
                                         {
-                                            txtOcrResult.AppendText(prevWord + " ");
+                                            ocrText += prevWord + " ";
                                             CurLoc = prevWord.Length + 1;
                                         }
                                     }
@@ -342,7 +344,7 @@ namespace amsocr
 
                         if (last_x > rect.Left)
                         {
-                            if (txtOcrResult.Text != "")
+                            if (ocrText != "")
                                 cr = true;
                             lineno++;
                         }
@@ -353,19 +355,21 @@ namespace amsocr
                     {
                         if (cr)
                         {
-                            txtOcrResult.AppendText("\r\n");
+                            ocrText += "\r\n";
                             if (curLocSet)
                                 CurLoc += 2;	// CR+LF
                         }
 
-                        txtOcrResult.AppendText(word.Text + " ");
+                        ocrText += word.Text + " ";
                     }
                 }
             }
+            txtOcrResult.AppendText(ocrText);
             lbStatus.Content = "Done. " + filename;
             DoingOCR = false;
             return true;
         }
+        // (x,y)-n\d*.jpg x,y: click座標 n: clickn語前の単語(def.=1)
         private void ParseFileName(string filename)
         {
             Regex r = new Regex(@"\((?<x>\d+),(?<y>\d+)\)");
