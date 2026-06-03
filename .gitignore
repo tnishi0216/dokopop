@@ -1,0 +1,13 @@
+*.bak
+*.csm
+*.drc
+*.db
+*.obj
+*.opendb
+*.tds
+*.#*
+.history
+.vs
+Debug
+obj
+Release
