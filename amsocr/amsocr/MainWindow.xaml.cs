@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -19,6 +20,163 @@ namespace amsocr
         {
             InitializeComponent();
             InitializeOcr();
+        }
+
+        private System.Windows.Interop.HwndSource _hwndSource;
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            // ウィンドウハンドルの取得とメッセージフックの設定
+            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            _hwndSource = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
+            if (_hwndSource != null){
+                _hwndSource.AddHook(WndProc);
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            // メッセージフックの削除
+            if (_hwndSource != null){
+                _hwndSource.RemoveHook(WndProc);
+            }
+        }
+
+        // Windowsメッセージ処理プロシージャ
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            int result;
+            switch (msg){
+                case WM_COPYDATA:
+                    result = HandleWM_COPYDATA(hwnd, wParam, lParam, ref handled);
+                    return new IntPtr(result);
+
+                case WM_AMSOCR:
+                    result = HandleWM_AMSOCR(hwnd, wParam, lParam, ref handled);
+                    return new IntPtr(result);
+
+                case WM_EXEC_OCR:
+                    result = HandleWM_EXEC_OCR(hwnd, wParam, lParam, ref handled);
+                    return new IntPtr(result);
+            }
+
+            return IntPtr.Zero;
+        }
+
+        // WM_COPYDATA メッセージの処理例
+        private int HandleWM_COPYDATA(IntPtr hwnd, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            try {
+                COPYDATASTRUCT cds = (COPYDATASTRUCT)Marshal.PtrToStructure(lParam, typeof(COPYDATASTRUCT));
+
+                handled = true;
+                switch ((int)cds.dwData){
+                    case WMCD_EXISTCHECK:
+                        // ウィンドウ存在確認
+                        // DBW("WM_COPYDATA: WMCD_EXISTCHECK received");
+                        return 1;
+
+                    case WMCD_SETPOINT:
+                        // ポイント設定（マウスカーソル位置などの情報受信）
+                        if (cds.cbData >= 8){
+                            int x = Marshal.ReadInt32(cds.lpData, 0);
+                            int y = Marshal.ReadInt32(cds.lpData, 4);
+                            DBW($"WM_COPYDATA: WMCD_SETPOINT received - X:{x}, Y:{y}");
+                            // 受け取ったポイント情報を処理
+                            CursorPoint = new System.Windows.Point(x, y);
+                            return 1;  // 成功
+                        }
+                        return 0;  // 失敗（データサイズが不足）
+
+                    case WMCD_RESTORE_WINDOW:
+                        // ウィンドウ復元
+                        // DBW("WM_COPYDATA: WMCD_RESTORE_WINDOW received");
+                        if (this.WindowState == WindowState.Minimized){
+                            this.WindowState = WindowState.Normal;
+                        }
+                        this.Activate();
+                        return 1;
+
+                    default:
+                        // その他のデータ受信
+#if false   // 参考
+                        if (cds.cbData > 0 && cds.lpData != IntPtr.Zero){
+                            string receivedData = Marshal.PtrToStringAnsi(cds.lpData, cds.cbData);
+                            DBW($"WM_COPYDATA: Custom data received - {receivedData}");
+                            return 1;  // 成功
+                        }
+#endif
+                        handled = false;
+                        return 0;  // 失敗
+                }
+            }
+            catch (Exception ex){
+                DBW($"Error in HandleWM_COPYDATA: {ex.Message}");
+                handled = false;
+                return 0;  // 処理失敗
+            }
+        }
+
+        // WM_AMSOCR メッセージの処理例
+        enum AMSOCR_CMD
+        {
+            QUERY = 0,
+            PAGE_CAPTURE = 1,
+        };
+        private int HandleWM_AMSOCR(IntPtr hwnd, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            handled = true;
+            try {
+                // wParam: 上位ワード = 通知コード, 下位ワード = コマンドパラメータ
+                // lParam: データポインタまたはハンドル
+                
+                AMSOCR_CMD command = (AMSOCR_CMD)wParam;
+                // DBW($"WM_AMSOCR: Command={command:X4}, lParam={lParam:X8}");
+                switch (command){
+                    case AMSOCR_CMD.QUERY:
+                        // DBW("WM_AMSOCR: Command Query");
+                        return (int)lParam;
+
+                    case AMSOCR_CMD.PAGE_CAPTURE:
+                        // DBW("WM_AMSOCR: Command Page Capture");
+                        return ((miCapturePage?.IsChecked ?? false) ? 1 : 0);
+
+                    default:
+                        DBW($"WM_AMSOCR: Unknown command {command:X4}");
+                        break;
+                }
+
+                return 0;
+            }
+            catch (Exception ex){
+                DBW($"Error in HandleWM_AMSOCR: {ex.Message}");
+            }
+            handled = false;
+            return 0;
+        }
+
+        // WM_EXEC_OCR メッセージの処理例
+        private int HandleWM_EXEC_OCR(IntPtr hwnd, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            handled = true;
+            try {
+                string filename = "";
+                while (FileNameQue.Count()!=0) {
+                    filename = FileNameQue.Dequeue();
+                }
+                if (filename != "") {
+                    ExecOCR(filename);
+                }
+                return 1;
+            }
+            catch (Exception ex){
+                DBW($"Error in HandleWM_EXEC_OCR: {ex.Message}");
+            }
+
+            handled = false;
+            return 0;
         }
         private async Task<OcrResult> RecognizeText(SoftwareBitmap snap)
         {
@@ -444,30 +602,13 @@ namespace amsocr
             }
         }
 
-        enum AMSOCR_CMD
-        {
-            QUERY = 0,
-            PAGE_CAPTURE = 1,
-        };
         struct POINT
         {
             public int x;
             public int y;
         };
         Point CursorPoint;
-#if false
-        unsafe static Point int2point(IntPtr param)
-        {
-            POINT pt = (POINT)Marshal.PtrToStructure((IntPtr)param, typeof(POINT));
-            Point p = new Point();
-            p.X = pt.x;
-            p.Y = pt.y;
-            return p;
-        }
-#endif
         int NumPrevWords = 1;
-
-        //TODO: event handler
 
         static int hWin = 0;
         void DBW(string msg)
