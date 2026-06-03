@@ -615,9 +615,9 @@ void ShowManual(HWND hwnd)
 void ShowLatestVersion()
 {
 #if __PROTO
-	const char *url = "http://pdic.la.coocan.jp/unicode/dev.html";
+	const char *url = "https://github.com/tnishi0216/dokopop";
 #else
-	const char *url = "http://dokopop.osdn.jp/";
+	const char *url = "https://pdic.sakura.ne.jp/dokopop/";
 #endif
 	ShellExecute( NULL, _T("open"), url, NULL, NULL, SW_SHOW );
 }
