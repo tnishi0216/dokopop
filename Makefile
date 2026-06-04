@@ -23,7 +23,7 @@ copy_bin:
 	$(CPI) DCHookTest\DKPUHK.dll ind\DKPUHK.dll
 	$(CPI) DCHookTest\DKPUHK64.DLL ind\DKPUHK64.dll
 	$(CPI) DCHookTest\DKPUHK64.exe ind\DKPUHK64.exe
-	$(CPI) DCHookTest\amodi.exe ind\amodi.exe
+	$(CPI) DCHookTest\amsocr.exe ind\amsocr.exe
 	$(CPI) bin\Interop.MODI.dll ind\Interop.MODI.dll
 	$(CPI) bin\ExMODIst.exe ind\ExMODIst.exe
 	$(CPI) DCHookTest\DCHookTest.exe ind\DKPu.exe

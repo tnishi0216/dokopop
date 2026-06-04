@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\amsocr.cpp" />
     <ClCompile Include="..\DCHook.cpp" />
     <ClCompile Include="..\MonitorScale.cpp" />
   </ItemGroup>

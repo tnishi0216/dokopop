@@ -208,7 +208,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		HookDll.Config(-1, KA_POPUP, KF_CONTROL);
 		TDCHConfig cfg;
 		memset(&cfg, 0, sizeof(cfg));
-		cfg.UseAMODI = 0;
+		cfg.UseAMSOCR = 0;
 		cfg.MoveSend = 0;
 		cfg.ScaleX = 0;
 		cfg.ScaleY = 0;

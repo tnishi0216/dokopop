@@ -167,7 +167,7 @@ namespace amsocr
                     filename = FileNameQue.Dequeue();
                 }
                 if (filename != "") {
-                    ExecOCR(filename);
+                    ExecOCRAsync(filename);
                 }
                 return 1;
             }
@@ -406,7 +406,7 @@ namespace amsocr
 //            tbText.Text = "";
             tbInfo.Text = "";
 
-            DBW("DoOCR:Read image file");
+            DBW("DoOCR:Read image file"+filename);
             ImgTarget.Source = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri(filename, UriKind.Absolute), BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
 
             OcrResult ocrResult;
@@ -599,6 +599,54 @@ namespace amsocr
                     // 連続して.bmpファイルが作られているため
                     tbInfo.AppendText("Delete Error:" + filename + "\r\n");
                 }
+            }
+        }
+
+        private async Task ExecOCRAsync(string filename)
+        {
+            try
+            {
+                var result = await DoOCR(filename);
+                if (result != "")
+                {
+                    string textname = filename + ".txt";
+                    for (int i = 0; i < 10; i++)
+                    {
+                        try
+                        {
+                            // ファイル書き込みは UI スレッド不要なので直接実行
+                            using (StreamWriter writer = new StreamWriter(textname, false, System.Text.Encoding.Unicode))
+                            {
+                                writer.WriteLine(CurLoc.ToString());
+                                writer.Write(result);
+                            }
+                        }
+                        catch
+                        {
+                            // UI 表示は Dispatcher 経由
+                            Dispatcher.Invoke(() => tbInfo.AppendText("Write Error:" + textname + "\r\n"));
+                            System.Threading.Thread.Sleep(30);
+                            continue;
+                        }
+                        break;
+                    }
+                }
+
+                if (!(miDebugMode?.IsChecked ?? false))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(filename);
+                    }
+                    catch
+                    {
+                        Dispatcher.Invoke(() => tbInfo.AppendText("Delete Error:" + filename + "\r\n"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() => tbInfo.AppendText("ExecOCRAsync Error:" + ex.Message + "\r\n"));
             }
         }
 

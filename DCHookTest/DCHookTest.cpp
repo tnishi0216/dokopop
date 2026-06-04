@@ -72,7 +72,7 @@ typedef WINUSERAPI BOOL (WINAPI *FNSetProcessDpiAwarenessContext)(UINT_PTR vaule
 #define	DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2	((UINT_PTR)-4)
 void SetDpiAware()
 {
-	HINSTANCE hDll = LoadLibrary( _T("user32") );
+	HINSTANCE hDll = LoadLibrary( TEXT("user32") );
 	if (!hDll)
 		return;
 	FNSetProcessDpiAwarenessContext fnSetProcessDpiAwarenessContext = (FNSetProcessDpiAwarenessContext)GetProcAddress(hDll, "SetProcessDpiAwarenessContext");

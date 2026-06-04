@@ -29,6 +29,7 @@
 #include "..\VxD\hk95d.h"
 #endif
 #include "MonitorScale.h"
+#include "amsocr.h"
 
 // Compiler //
 #pragma	warning( disable : 4710 )	// どうしてこういうwarningが出てくるのか？
@@ -99,11 +100,6 @@
 #define	DBW		(void)
 #endif
 void dbw(const char *format, ...);
-
-#define	WM_AMODI				(WM_APP+0x400)	// app communication message with AMODI
-#define	WM_MOVESEND				(WM_APP+0x208)	// DCH_MOVESENDの代わりにPostMessageで送る
-#define	AMODI_CMD_QUERY			0
-#define	AMODI_CMD_PAGE_CAPTURE	1
 
 #define	tsizeof(type)	sizeof(type)
 #define	int_bool(v)		((v)!=0)
@@ -207,9 +203,7 @@ int GetTextFromPoint( HDC hdc, const wchar_t *text, int len, int pos, int pos_y,
 bool CaptureImage(HWND hwnd, bool movesend, bool non_block);
 bool WaitAndGetResult(const TCHAR *text_path, unsigned waittime);
 HANDLE WaitForResult(const TCHAR *text_path, unsigned waittime);
-HWND FindAMODI();
-int SendAMODI(int cmd, const char *data, int len);
-void CheckAMODIAlive();
+void CheckAMSOCRAlive();
 void SendMoveMessage();
 void SendCancelMove();
 DWORD WINAPI SendMoveThread(LPVOID vdParam);
@@ -312,10 +306,10 @@ char VxDpathName[256];	// HK95.vxd path
 #endif
 DWORD siPageSize = 0;
 HWND hwndOrg = NULL;
-HWND hwndAMODI = NULL;
-bool RequireHwndAMODI = false;
-bool OnlyAMODI = false;
-bool tryAMODI = false;
+AMSOCR amsocr;
+bool RequireHwndAMSOCR = false;
+bool OnlyAMSOCR = false;
+bool tryAMSOCR = false;
 bool MoveSend = false;
 #if USE_DBW
 int attach = 0;
@@ -405,8 +399,6 @@ TString<wchar_t> *LastTextW;
 
 bool MoveSendMode;
 
-TCHAR AMODIPath[256];
-bool ExtAMODI = false;
 int ScaleX = 0;	// 96を1とした画面の拡大率
 int ScaleY = 0;
 int generation = 0;
@@ -822,18 +814,18 @@ bool WINAPI Init( HWND _hwnd, const char * /*module_name*/, bool windowsnt, cons
 
 	idDokopopProcess = GetCurrentProcessId();
 
-	// get AMODI infomation.
-	if (!tryAMODI){
-		tryAMODI = true;
-		hwndAMODI = FindAMODI();
+	// get AMSOCR infomation.
+	if (!tryAMSOCR){
+		tryAMSOCR = true;
+		amsocr.Find(true);
 #if 0
-		if (hwndAMODI){
+		if (amsocr.GetHandle()){
 			DWORD procId;
 			if (GetWindowThreadProcessId(hwnd, &procId)){
 				HANDLE hProc = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, procId);
 				if (hProc){
-					memset(AMODIPath, 0, sizeof(AMODIPath));
-					if (GetModuleFileNameEx(hProc, NULL, AMODIPath, sizeof(AMODIPath))>0){
+					memset(AMSOCRPath, 0, sizeof(AMSOCRPath));
+					if (GetModuleFileNameEx(hProc, NULL, AMSOCRPath, sizeof(AMSOCRPath))>0){
 						// OK
 					}
 					CloseHandle(hProc);
@@ -882,45 +874,27 @@ int WINAPI Config( int clickonly, int keyaction, int keyflag )
 __declspec(dllexport)
 int WINAPI Config2( const struct TDCHConfig *cfg )
 {
-	DBW("Config2: %d %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseAMODI, (int)ExtAMODI, cfg->UseNumPrev ? cfg->NumPrevWords : 1);
+	DBW("Config2: %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseAMSOCR, cfg->UseNumPrev ? cfg->NumPrevWords : 1);
 
 	MoveSend = cfg->MoveSend ? true : false;
 	MoveSent = false;
-	OnlyImage = cfg->OnlyImage;
+	OnlyImage = (cfg->OnlyImage == 1);
 	ScaleX = cfg->ScaleX;
 	ScaleY = cfg->ScaleY;
 	NumPrevWords = cfg->UseNumPrev ? cfg->NumPrevWords : 1;
 
-	RequireHwndAMODI = false;
+	RequireHwndAMSOCR = false;
 
-	if (cfg->UseAMODI){
-		if (!ExtAMODI){
-			RequireHwndAMODI = true;
-			if (!hwndAMODI)
-				hwndAMODI = FindAMODI();
-		}
+	if (cfg->UseAMSOCR){
+		RequireHwndAMSOCR = true;
+		amsocr.Find();
 	} else {
-		hwndAMODI = NULL;
-		ExtAMODI = false;
+		amsocr.ResetHandle();
 		return 0;
 	}
 
-	OnlyAMODI = int_bool(cfg->OnlyAMODI);
-	AMODIPath[0] = '\0';
-	ExtAMODI = false;
-	if (cfg->AMODIPath[0]){
-		size_t len = strlen(cfg->AMODIPath);
-		if (len<sizeof(AMODIPath)-2){
-			memcpy(AMODIPath, cfg->AMODIPath, len);
-			if (AMODIPath[len-1]!='\\'){
-				AMODIPath[len] = '\\';
-				len++;
-			}
-			AMODIPath[len] = '\0';
-			ExtAMODI = true;
-		}
-	}
-	dbw("Config2[%d]: %d %d %s", ++generation, cfg->ScaleX, cfg->ScaleY, AMODIPath);
+	OnlyAMSOCR = int_bool(cfg->OnlyAMSOCR);
+	dbw("Config2[%d]: %d %d", ++generation, cfg->ScaleX, cfg->ScaleY);
 	return 0;
 }
 //Note:
@@ -1196,11 +1170,11 @@ j_discard:
 
 bool DoCapture(HWND hwnd, POINT pt, bool movesend, bool image_only, bool runOnLaunchedProc, bool non_block)
 {
-	DBW("DoCapture: %d %d %d %d %d", image_only, runOnLaunchedProc, hwndAMODI, ExtAMODI, OnlyAMODI);
+	DBW("DoCapture: %d %d %d %d", image_only, runOnLaunchedProc, amsocr.GetHandle(), OnlyAMSOCR);
 	CursorPoint = ScreenPoint = pt;
 	ScreenToClient( hwnd, &CursorPoint );
 
-#if 1	// acrobat reader上でclickするとhwndAMODIがnullになってしまう場合があるため（原因不明）
+#if 1	// acrobat reader上でclickするとhwndAMSOCRがnullになってしまう場合があるため（原因不明）
 		// ・reader上ではmouse eventがピタッと止まる
 		// ・reader上でclickしただけではnullにならない
 		// ・reader上でctrl+clickすると、reader上からmouseを外すとnullになっている
@@ -1209,15 +1183,14 @@ bool DoCapture(HWND hwnd, POINT pt, bool movesend, bool image_only, bool runOnLa
 		// まるでDokoPop!対策をしているかのようだ。いずれにせよ、mouse eventがまったく来ない、
 		// おそらくreaderのほうでmouse hookを呼ばないようにしているのだろう、
 		// なので、null原因が仮にわかったとしても、reader上では検索ができないはず
-	if (RequireHwndAMODI){
-		if (!hwndAMODI)
-			hwndAMODI = FindAMODI();
+	if (RequireHwndAMSOCR){
+		amsocr.Find();
 	}
 #endif
 
 	if (!image_only && !runOnLaunchedProc){
 		//DBW("hwnd:%08X %d %d", (int)hwnd, CursorPoint.x, CursorPoint.y);
-		if ((!hwndAMODI && !ExtAMODI) || !OnlyAMODI){
+		if (!amsocr.GetHandle() || !OnlyAMSOCR){
 			// Redraw Metafile //
 			UNPROTECT_SHARE();
 			DBW("Target : %08X %d", hwnd, curProcess);
@@ -1228,7 +1201,7 @@ bool DoCapture(HWND hwnd, POINT pt, bool movesend, bool image_only, bool runOnLa
 			}
 		}
 	}
-	if (image_only || hwndAMODI || ExtAMODI){
+	if (image_only || amsocr.GetHandle()){
 		if (CaptureImage(hwnd, movesend, non_block))
 			return true;
 	}
@@ -2538,9 +2511,6 @@ int GetTextFromPoint( HDC hdc, const wchar_t *text, int len, int pos_x, int pos_
 #endif
 }
 
-#define	WMCD_EXISTCHECK		0x4000
-#define	WMCD_SETPOINT		0x4001
-
 class TDC {
 	HDC hdc;
 	HWND hwnd;
@@ -2576,8 +2546,8 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 	CaptureImageBlocking = false;
 
 	bool capture_page = false;
-	if (hwndAMODI){
-		capture_page = SendMessage(hwndAMODI, WM_AMODI, AMODI_CMD_PAGE_CAPTURE, 0) ? true : false;
+	if (amsocr.GetHandle()){
+		capture_page = SendMessage(amsocr.GetHandle(), WM_AMSOCR, AMSOCR_CMD_PAGE_CAPTURE, 0) ? true : false;
 	}
 
 	// Get the rect of the target window.
@@ -2586,13 +2556,11 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 		// window died?
 		return false;
 	}
-	if (!ExtAMODI){
-		if (!IsWindowEnabled(hwndAMODI)){
-			// AMODI died?
-			hwndAMODI = FindAMODI();
-			if (!hwndAMODI)
-				return false;
-		}
+	if (!amsocr.IsWindowEnabled()){
+		// AMSOCR died?
+		amsocr.Find(true);
+		if (!amsocr.GetHandle())
+			return false;
 	}
 	int w = rcTarget.right - rcTarget.left;
 	int h = rcTarget.bottom - rcTarget.top;
@@ -2725,29 +2693,18 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 	if (ok){
 		ok = false;
 
-		//TCHAR path[sizeof(AMODIPath)+40];
 		TCHAR *path = ImageTextPath;
 		size_t path_size = sizeof(ImageTextPath);
 		size_t len;
-		if (ExtAMODI){
-			len = _tcslen(AMODIPath);
-			_tcscpy(path, AMODIPath);
-		} else {
-			memset(path, 0, path_size);
-			len = GetTempPath((DWORD)path_size, path);
-		}
+		memset(path, 0, path_size);
+		len = GetTempPath((DWORD)path_size, path);
 		if (len>0){
-			// send image to AMODI
+			// send image to AMSOCR
 			SYSTEMTIME t;
 			GetLocalTime(&t);
-			if (ExtAMODI){
-				wsprintf(path+len, /*path_size-len,*/ _T("\\%04d-%02d-%02d-%02d%02d%02d-(%d,%d)-n%d.bmp"),
-					t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, ptCursor.x, ptCursor.y, NumPrevWords );
-			} else {
-				wsprintf(path+len, /*path_size-len,*/ _T("\\amodi\\%04d-%02d-%02d-%02d%02d%02d-n%d.bmp"),
-					t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, NumPrevWords );
-				SendAMODI(WMCD_SETPOINT, (char*)&ptCursor, sizeof(ptCursor));
-			}
+			wsprintf(path+len, /*path_size-len,*/ _T("\\amsocr\\%04d-%02d-%02d-%02d%02d%02d-n%d.bmp"),
+				t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, NumPrevWords );
+			amsocr.Send(WMCD_SETPOINT, (char*)&ptCursor, sizeof(ptCursor));
 			HANDLE fh = CreateFile(path,  GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (fh!=INVALID_HANDLE_VALUE){
 				DWORD dwSize;
@@ -2786,7 +2743,7 @@ bool WaitAndGetResult(const TCHAR *path, unsigned waittime)
 {
 	bool ok = false;
 
-	// wait and get text from AMODI
+	// wait and get text from AMSOCR
 
 	HANDLE fh = WaitForResult(path, waittime);
 
@@ -2794,7 +2751,7 @@ bool WaitAndGetResult(const TCHAR *path, unsigned waittime)
 
 	if (fh==INVALID_HANDLE_VALUE){
 		DBW("file open timeout");
-		CheckAMODIAlive();
+		CheckAMSOCRAlive();
 	} else {
 		DWORD size = GetFileSize(fh, NULL);
 		if (size>0){
@@ -2858,49 +2815,9 @@ HANDLE WaitForResult(const TCHAR *path, unsigned waittime)
 	return fh;
 }
 
-#define	APPNAME	_T("Auto MODI")
-
-static HWND hwndFind;
-static BOOL CALLBACK EnumWindowsProc( HWND hwnd, LPARAM lParam )
+void CheckAMSOCRAlive()
 {
-	TCHAR wndname[80];
-	if (GetWindowText(hwnd, wndname, tsizeof(wndname))<0){
-		return TRUE;
-	}
-	if (_tcscmp(wndname, APPNAME)){ return TRUE; }
-
-	COPYDATASTRUCT cd;
-	cd.dwData = WMCD_EXISTCHECK;
-	cd.lpData = (void*)APPNAME;
-	cd.cbData = (DWORD)(_tcslen(APPNAME)+1)*sizeof(TCHAR);
-	if ( SendMessage( hwnd, WM_COPYDATA, 0, (LPARAM)&cd ) )
-	{
-		// found
-		hwndFind = hwnd;
-		return FALSE;
-	}
-	return TRUE;
-}
-
-HWND FindAMODI()
-{
-	hwndFind = NULL;
-	EnumWindows(EnumWindowsProc, 0);
-	return hwndFind;
-}
-
-int SendAMODI(int cmd, const char *data, int len)
-{
-	COPYDATASTRUCT cd;
-	cd.dwData = cmd;
-	cd.lpData = (void*)data;
-	cd.cbData = len;
-	return (int)SendMessage(hwndAMODI, WM_COPYDATA, 0, (LPARAM)&cd);
-}
-
-void CheckAMODIAlive()
-{
-	CallbackMain(DCH_LAUNCH_AMODI, NULL, 0, 0);
+	CallbackMain(DCH_LAUNCH_AMSOCR, NULL, 0, 0);
 }
 
 void SendMoveMessage()

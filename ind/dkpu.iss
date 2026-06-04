@@ -23,7 +23,7 @@ Source: "DKPu.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "DKPUHK.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "DKPUHK64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "DKPUHK64.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "amodi.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "amsocr.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Interop.MODI.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "ExMODIst.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "DKPu.txt"; DestDir: "{app}"; Flags: ignoreversion

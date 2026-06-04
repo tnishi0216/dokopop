@@ -123,14 +123,13 @@ private:	// ユーザー宣言
 	bool CtrlClose;
 	bool IgnoreJ;
 	bool Banner;
-	int CaptureMode;	// 0:conventional 1:use AMODI
-	bool AMODIAvail;	// AMODI available or not
-	AnsiString AMODIPath;
+	int CaptureMode;	// 0:conventional 1:use AMSOCR
+	bool AMSOCRAvail;	// AMSOCR available or not
 	bool MouseIncSrch;
 public:		// ユーザー宣言
 	__fastcall TDCHookMainForm(TComponent* Owner);
 	void EvCopyData(TMessage&);
-	void InitAMODI();
+	void InitAMSOCR();
 	void Start();
 	void MenuClosed();
 	void ShowNotify();
@@ -146,7 +145,7 @@ public:		// ユーザー宣言
 	POINT CursorPoint;
 	void SetupConfig();
 	void SetupConfig2();
-	void SetupAMODI();
+	void SetupAMSOCR();
 	bool EnablePopup;
 	bool DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend );
 	tchar *PopupText;
@@ -175,7 +174,7 @@ public:		// ユーザー宣言
 	HWND FindPdic( );
 	LRESULT SendCopyData( HWND hwnd, int message, const char *str );
 
-	void NotifyAMODI();
+	void NotifyAMSOCR();
 
 	void Reboot();
 	

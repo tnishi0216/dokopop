@@ -33,7 +33,7 @@ void __fastcall TMODINotifyDialog::FormCreate(TObject *Sender)
 	SendMessage(reMsg->Handle, EM_SETEVENTMASK, 0, emask | ENM_LINK);
 
 	modiInstalled = MODIInstalled();
-	amodiRunable = AMODIRunable();
+	amodiRunable = AMSOCRRunable();
 
 	SetMessage();	
 }
@@ -69,7 +69,7 @@ URL_MODI_INSTALL"\n"
 void __fastcall TMODINotifyDialog::tmInstallCheckTimer(TObject *Sender)
 {
 	bool _modiInstalled = MODIInstalled();
-	bool _amodiRunable = AMODIRunable();
+	bool _amodiRunable = AMSOCRRunable();
 	if (_modiInstalled && _amodiRunable){
 		// ready to go
 		Close();
