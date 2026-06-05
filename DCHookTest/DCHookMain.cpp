@@ -10,7 +10,6 @@
 #include "Notify.h"
 #include "DCHookLoader.h"
 #include "prgprof.h"
-#include "MODINotifyDlg.h"
 #include "prgconfig.h"
 #include "OCRTextFrm.h"
 #include "MonitorScale.h"
@@ -41,8 +40,6 @@
 /*------------------------------------------*/
 /*		Definitions							*/
 /*------------------------------------------*/
-#define	URL_MODI_INSTALL	"http://support.microsoft.com/kb/982760"
-
 #define	DEF_POPUPKEY		(KF_CONTROL)
 #define	DEF_TOGGLEKEY		(KF_CONTROL+KF_MENU)
 
@@ -181,12 +178,6 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	lbVersion->Top = btnOK->Top;
 	
 	BootTimer->Enabled = true;
-
-	if (!AMSOCRAvail && (CaptureMode & CM_IMAGE)){
-		tmMODINotify->Enabled = true;
-	}
-
-//	Application->OnIdle = IdleHandler;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
@@ -230,15 +221,6 @@ void __fastcall TDCHookMainForm::FormKeyPress(TObject *Sender, char &Key)
 	}
 #endif
 }
-#if 0
-void __fastcall TDCHookMainForm::IdleHandler(TObject *sender, bool &done)
-{
-	if (NotifyAMSOCREnabled){
-		NotifyAMSOCREnabled = false;
-		NotifyAMSOCR();
-	}
-}
-#endif
 //---------------------------------------------------------------------------
 // Menu event
 //---------------------------------------------------------------------------
@@ -271,19 +253,6 @@ void __fastcall TDCHookMainForm::miIncSearchClick(TObject *Sender)
 		}
 	}
 }
-//---------------------------------------------------------------------------
-#if 0	// change capture mode
-	if (!AMSOCRAvail && (CaptureMode & CM_IMAGE)){
-		InitAMSOCR();
-	}
-	if (AMSOCRAvail){
-		SetupConfig2();
-	} else {
-		NotifyAMSOCR();
-	}
-
-	MenuClosed();
-#endif
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::miEnablePopupClick(TObject *Sender)
 {
@@ -319,10 +288,8 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 	PopupConfigDlg->cbCtrlClose->Checked = CtrlClose;
 	PopupConfigDlg->cbIgnoreJ->Checked = IgnoreJ;
 	PopupConfigDlg->cbBanner->Checked = Banner;
-	bool useAMSOCR = CaptureMode & CM_IMAGE ? true : false;
 	PopupConfigDlg->SetCaptureMode( CaptureMode );
 	PopupConfigDlg->SetScaler( Ini->ReadInteger(PFS_CONFIG, PFS_SCALE, 0) );
-	PopupConfigDlg->SetMODIAvail( AMSOCRAvail );
 	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, DEF_USE64);
 	PopupConfigDlg->cbUse64->Checked = use64;
 	SetForegroundWindow( PopupConfigDlg->Handle );
@@ -343,10 +310,6 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 		SaveConfig();
 		SetupConfig();
 		tmReInit->Enabled = false;
-		if (!useAMSOCR && (CaptureMode & CM_IMAGE) && !AMSOCRAvail){
-			// AMSOCR off->ON ‚©‚Â AMSOCR‚ª‚¢‚È‚¢ê‡
-			NotifyAMSOCR();
-		}
 		if (PopupConfigDlg->cbUse64->Checked != use64){
 			// 64bit hook •ÏXŽž
 			Unhook();
@@ -424,9 +387,6 @@ void __fastcall TDCHookMainForm::miTestClick(TObject *Sender)
 #ifdef _DEBUG
 #if 1
 	hDll->Init32(Handle);
-#endif
-#if 0
-	NotifyAMSOCR();
 #endif
 #if 0
 	miIncSearchClick(Sender);
@@ -553,31 +513,6 @@ void __fastcall TDCHookMainForm::tmMouseMoveTimer(TObject *Sender)
 		return;
 	//hDll->Capture();
 	hDll->CaptureAsync();
-}
-//---------------------------------------------------------------------------
-void __fastcall TDCHookMainForm::tmMODIInstallCheckTimer(TObject *Sender)
-{
-	if (MODIInstalled()){
-#if 0
-		Reboot();
-#else
-		// Å‰‚Ìpopup‚Å—Ž‚¿‚Ä‚µ‚Ü‚¤H
-		if (!AMSOCRAvail && (CaptureMode & CM_IMAGE)){
-			InitAMSOCR();
-		}
-		if (AMSOCRAvail){
-			SetupConfig2();
-		}
-#endif
-	}
-}
-//---------------------------------------------------------------------------
-void __fastcall TDCHookMainForm::tmMODINotifyTimer(TObject *Sender)
-{
-	tmMODINotify->Enabled = false;
-	if (!AMSOCRRunable()){
-		NotifyAMSOCR();
-	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::tmReInitTimer(TObject *Sender)
@@ -1408,9 +1343,6 @@ void TDCHookMainForm::SetupAMSOCR()
 				tmReInit->Enabled = true;	// retry later
 		}
 	}
-	if (AMSOCRAvail){
-		tmMODIInstallCheck->Enabled = false;
-	}
 }
 void TDCHookMainForm::EnableClickOnly( bool enable )
 {
@@ -1479,15 +1411,6 @@ void TDCHookMainForm::ShowNotify()
 	SetWindowPos( NotifyForm->Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE );
 	tmNotify->Enabled = false;
 	tmNotify->Enabled = true;
-}
-void TDCHookMainForm::NotifyAMSOCR()
-{
-	MODINotifyDialog = new TMODINotifyDialog(this);
-	MODINotifyDialog->ShowModal();
-	if (MODINotifyDialog->LinkClicked || AMSOCRRunable()){
-		tmMODIInstallCheck->Enabled = true;
-	}
-	delete MODINotifyDialog;
 }
 void TDCHookMainForm::Reboot()
 {

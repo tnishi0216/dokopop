@@ -14,7 +14,6 @@ TPopupConfigDlg *PopupConfigDlg;
 __fastcall TPopupConfigDlg::TPopupConfigDlg(TComponent* Owner)
 	: TForm(Owner)
 {
-	MODIAvail = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::cbGroupOpenClick(TObject *Sender)

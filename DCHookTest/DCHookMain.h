@@ -66,8 +66,6 @@ __published:	// IDE 管理のコンポーネント
 	TMenuItem *N2;
 	TMenuItem *miConfig;
 	TMenuItem *miInstallMODI;
-	TTimer *tmMODIInstallCheck;
-	TTimer *tmMODINotify;
 	TMenuItem *miCheckLatest;
 	TMenuItem *miOCRText;
 	TTimer *tmReInit;
@@ -102,8 +100,6 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall miIncSearchClick(TObject *Sender);
 	void __fastcall tmMouseMoveTimer(TObject *Sender);
 	void __fastcall miConfigClick(TObject *Sender);
-	void __fastcall tmMODIInstallCheckTimer(TObject *Sender);
-	void __fastcall tmMODINotifyTimer(TObject *Sender);
 	void __fastcall miCheckLatestClick(TObject *Sender);
 	void __fastcall miOCRTextClick(TObject *Sender);
 	void __fastcall tmReInitTimer(TObject *Sender);
@@ -174,10 +170,7 @@ public:		// ユーザー宣言
 	HWND FindPdic( );
 	LRESULT SendCopyData( HWND hwnd, int message, const char *str );
 
-	void NotifyAMSOCR();
-
 	void Reboot();
-	
 protected:
 	BEGIN_MESSAGE_MAP
 		VCL_MESSAGE_HANDLER(WM_COPYDATA, TMessage, EvCopyData)

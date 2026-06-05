@@ -2725,19 +2725,6 @@ object DCHookMainForm: TDCHookMainForm
     Left = 144
     Top = 273
   end
-  object tmMODIInstallCheck: TTimer
-    Enabled = False
-    Interval = 3000
-    OnTimer = tmMODIInstallCheckTimer
-    Left = 192
-    Top = 276
-  end
-  object tmMODINotify: TTimer
-    Enabled = False
-    OnTimer = tmMODINotifyTimer
-    Left = 232
-    Top = 273
-  end
   object tmReInit: TTimer
     Enabled = False
     OnTimer = tmReInitTimer

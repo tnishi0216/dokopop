@@ -57,7 +57,6 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall cbCaptureModeChange(TObject *Sender);
 	void __fastcall cbDPISettingClick(TObject *Sender);
 private:	// ユーザー宣言
-	bool MODIAvail;
 public:		// ユーザー宣言
 	__fastcall TPopupConfigDlg(TComponent* Owner);
 	void SetPopupKey( int keycomb );
@@ -68,7 +67,6 @@ public:		// ユーザー宣言
 	bool GetDPIDetect();
 	void SetScaler(int scale);
 	int GetScaler();
-	void SetMODIAvail(bool avail) { MODIAvail = avail; }
 	void SetCaptureMode(int mode);
 	int GetCaptureMode();
 };
