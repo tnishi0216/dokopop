@@ -5,12 +5,9 @@
 #include "prgconfig.h"
 #include "Util.h"
 #include "prgprof.h"
+#include "pdver.h"
 
 //---------------------------------------------------------------------------
-const char *AppName = "DokoPop";
-const char *StrVersion = "Ver.2.1.4";
-int VersionValue = 0x020104;	// xxyyzz -> xx.yy.zz x=major y=minor(0-255) z=release(0-255)
-
 #pragma package(smart_init)
 
 #ifdef USE_UNICODE
@@ -575,11 +572,26 @@ HWND FindPrev()
 {
 	return FindApp("TDCHookMainForm", NULL, APPNAME);
 }
+const char *GetStrVersion()
+{
+	ProjectRCVersion rcver(Application->ExeName.c_str());
+	static AnsiString str_version;
+	if (str_version.data())
+		return str_version.c_str();
+	rcver.GetProductVersion(str_version);
+	return str_version.c_str();
+}
+unsigned GetVersionValue()
+{
+	ProjectRCVersion rcver(Application->ExeName.c_str());
+	return rcver.GetProductVersionValue();
+}
 int CheckVersion(HWND hwnd)
 {
 	int ver = SendMessage(hwnd, WM_GET_VERSION, 0, 0);
 	if (ver==0){ return -1; }	// older than ver.2.0
-	return ver - VersionValue;
+	int version_value = GetVersionValue();
+	return ver - version_value;
 }
 HWND FindAMODI()
 {

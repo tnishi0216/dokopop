@@ -18,6 +18,7 @@ USEFORM("MODINotifyDlg.cpp", MODINotifyDialog);
 USEUNIT("prgconfig.cpp");
 USEFORM("OCRTextFrm.cpp", OCRTextForm);
 USEUNIT("MonitorScale.cpp");
+USEUNIT("pdver.cpp");
 //---------------------------------------------------------------------------
 #include "prgconfig.h"
 #include "DCHookMain.h"

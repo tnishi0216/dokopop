@@ -8,7 +8,7 @@
       obj\PopupConfig.obj obj\Util.obj obj\Notify.obj obj\mustr.obj 
       obj\HookDLl.obj obj\HookLoader.obj obj\DCHookLoader.obj obj\prgprof.obj 
       obj\MODINotifyDlg.obj obj\prgconfig.obj obj\OCRTextFrm.obj 
-      obj\MonitorScale.obj"/>
+      obj\MonitorScale.obj obj\pdver.obj"/>
     <RESFILES value="DCHookTest.res obj\icon.res"/>
     <IDLFILES value=""/>
     <DEFFILE value=""/>
@@ -51,8 +51,8 @@ IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=2
 MinorVer=1
-Release=3
-Build=82
+Release=4
+Build=79
 Debug=0
 PreRelease=0
 Special=0
@@ -64,7 +64,7 @@ CodePage=932
 [Version Info Keys]
 CompanyName=Doko Pop Project
 FileDescription=DokoPop for Windows
-FileVersion=2.1.3.82
+FileVersion=2.1.4.79
 InternalName=DokoPop
 LegalCopyright=Copyright (c) DokoPopProject
 LegalTrademarks=

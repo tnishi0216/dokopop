@@ -88,6 +88,8 @@ bool _WinExec( const char *cmd, int show, int waittime, const char *dir=NULL);
 HANDLE WinExecEx( const char *cmd, int show, const char *dir=NULL, const char *title=NULL );
 HWND FindApp(const char *clsname, const char *wndname, const char *appname);
 HWND FindPrev();
+const char *GetStrVersion();
+unsigned GetVersionValue();
 int CheckVersion(HWND hwnd);
 HWND FindAMODI();
 HWND FindPopupWindow( );
@@ -108,9 +110,6 @@ void dbw( const char *format, ... );
 /*------------------------------------------*/
 /*		Global Variables					*/
 /*------------------------------------------*/
-extern const char *AppName;
-extern const char *StrVersion;
-extern int VersionValue;
 extern bool WindowsNT;
 extern bool fWow64;
 

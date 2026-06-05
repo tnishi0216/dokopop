@@ -176,7 +176,7 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	InitAMODI();
 	btnOK->Left = (SavedWidth - btnOK->Width)>>1;
 	btnOK->Top = Height - btnOK->Height - 8;
-	lbVersion->Caption = StrVersion;
+	lbVersion->Caption = GetStrVersion();
 	lbVersion->Left = btnOK->Left + btnOK->Width + 4;
 	lbVersion->Top = btnOK->Top;
 	
@@ -1468,7 +1468,7 @@ void TDCHookMainForm::EvShortcut( TMessage &msg )
 }
 void TDCHookMainForm::EvGetVersion( TMessage &msg )
 {
-	msg.Result = VersionValue;
+	msg.Result = GetVersionValue();
 }
 //---------------------------------------------------------------------------
 // 右クリック検索ON/OFF表示
