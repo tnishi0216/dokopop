@@ -167,7 +167,7 @@ namespace amsocr
                     filename = FileNameQue.Dequeue();
                 }
                 if (filename != "") {
-                    ExecOCRAsync(filename);
+                    ExecOCR(filename);
                 }
                 return 1;
             }
@@ -245,8 +245,12 @@ namespace amsocr
 
                 if (jpgFiles.Length == 0)
                 {
-                    MessageBox.Show("No JPG files found in " + directory);
-                    return "";
+                    jpgFiles = System.IO.Directory.GetFiles(directory, "*.bmp");
+                    if (jpgFiles.Length == 0)
+                    {
+                        MessageBox.Show("No JPG/BMP files found in " + directory);
+                        return "";
+                    }
                 }
 
                 // 最初に見つかったファイルを返す
@@ -272,7 +276,7 @@ namespace amsocr
                 if (imgpath != "")
                 {
                     var ocrText = await DoOCR(imgpath);
-                    txtOcrResult.AppendText(ocrText);
+                    txtOcrResult.Text = ocrText;
                 }
             }
         }
@@ -564,7 +568,7 @@ namespace amsocr
             PostMessage(hwnd, WM_EXEC_OCR, IntPtr.Zero, IntPtr.Zero);
         }
 
-        private void ExecOCR(string filename)
+        private void __oldExecOCR(string filename)
         {
             var result = DoOCR(filename);
             if (result.Result != "")
@@ -602,7 +606,7 @@ namespace amsocr
             }
         }
 
-        private async Task ExecOCRAsync(string filename)
+        private async Task ExecOCR(string filename)
         {
             try
             {
@@ -630,6 +634,8 @@ namespace amsocr
                         }
                         break;
                     }
+                    DBW("ocrText="+result);
+                    Dispatcher.Invoke(() => txtOcrResult.Text = result);
                 }
 
                 if (!(miDebugMode?.IsChecked ?? false))
@@ -640,13 +646,14 @@ namespace amsocr
                     }
                     catch
                     {
+                        // 連続して.bmpファイルが作られているため
                         Dispatcher.Invoke(() => tbInfo.AppendText("Delete Error:" + filename + "\r\n"));
                     }
                 }
             }
             catch (Exception ex)
             {
-                Dispatcher.Invoke(() => tbInfo.AppendText("ExecOCRAsync Error:" + ex.Message + "\r\n"));
+                Dispatcher.Invoke(() => tbInfo.AppendText("ExecOCR Error:" + ex.Message + "\r\n"));
             }
         }
 
