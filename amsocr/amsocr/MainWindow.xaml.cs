@@ -1,7 +1,5 @@
 ﻿using Microsoft.Win32;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -16,6 +14,8 @@ namespace amsocr
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const bool IMG_DOUBLE = true;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -297,8 +297,30 @@ namespace amsocr
                 var irstream = WindowsRuntimeStreamExtensions.AsRandomAccessStream(stream);
 
                 //画像データをSoftwareBitmapに変換
+#if IMG_DOUBLE
+                var decoder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(irstream);
+
+                // ここで画像サイズを2倍に拡大して取得する（補間はLinear）
+                uint scaledWidth = decoder.PixelWidth * 2;
+                uint scaledHeight = decoder.PixelHeight * 2;
+                var transform = new BitmapTransform()
+                {
+                    ScaledWidth = scaledWidth,
+                    ScaledHeight = scaledHeight,
+                    InterpolationMode = BitmapInterpolationMode.Linear
+                };
+
+                sbitmap = await decoder.GetSoftwareBitmapAsync(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Premultiplied,
+                    transform,
+                    Windows.Graphics.Imaging.ExifOrientationMode.RespectExifOrientation,
+                    Windows.Graphics.Imaging.ColorManagementMode.DoNotColorManage
+                );
+#else
                 var decorder = await Windows.Graphics.Imaging.BitmapDecoder.CreateAsync(irstream);
                 sbitmap = await decorder.GetSoftwareBitmapAsync();
+#endif
             }
 
             return sbitmap;
@@ -439,6 +461,10 @@ namespace amsocr
             int last_x = 0;
             int lineno = 0;
             CurLoc = 0;
+#if IMG_DOUBLE
+            CursorPoint.X *= 2;
+            CursorPoint.Y *= 2;
+#endif
             lbPoint.Content = "" + CursorPoint.X + "," + CursorPoint.Y;
             tbInfo.AppendText("Page:" + ocrResult.Lines.Count + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
             String ocrText = "";
