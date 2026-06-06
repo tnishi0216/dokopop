@@ -243,13 +243,14 @@ namespace amsocr
 
                 var jpgFiles = System.IO.Directory.GetFiles(directory, "*.jpg");
 
-                if (jpgFiles.Length == 0)
-                {
-                    jpgFiles = System.IO.Directory.GetFiles(directory, "*.bmp");
-                    if (jpgFiles.Length == 0)
-                    {
-                        MessageBox.Show("No JPG/BMP files found in " + directory);
-                        return "";
+                if (jpgFiles.Length == 0){
+                    jpgFiles = System.IO.Directory.GetFiles(directory, "*.png");
+                    if (jpgFiles.Length == 0){
+                        jpgFiles = System.IO.Directory.GetFiles(directory, "*.bmp");
+                        if (jpgFiles.Length == 0){
+                            MessageBox.Show("No JPG/PNG/BMP files found in " + directory);
+                            return "";
+                        }
                     }
                 }
 
@@ -385,16 +386,13 @@ namespace amsocr
             //OCRの実行処理
             var sbitmap = await ConvertSoftwareBitmap(ImgTarget);
             OcrEngine engine;
-            if (miUseDefLang?.IsChecked ?? false)
-            {
+            if (miUseDefLang?.IsChecked ?? false){
                 string language = "ja-JP";
                 engine = OcrEngine.TryCreateFromLanguage(new Windows.Globalization.Language(language));
-            }
-            else
-            {
-                //OCRを実行する
+            } else {
                 engine = OcrEngine.TryCreateFromUserProfileLanguages();
             }
+            //OCRを実行する
             return await engine.RecognizeAsync(sbitmap);
         }
         async Task<String> DoOCR(string filename)
