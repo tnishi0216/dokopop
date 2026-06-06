@@ -22,7 +22,7 @@ namespace amsocr
             InitializeOcr();
         }
 
-        private System.Windows.Interop.HwndSource _hwndSource;
+        private System.Windows.Interop.HwndSource? _hwndSource;
 
         protected override void OnSourceInitialized(EventArgs e)
         {
@@ -69,7 +69,13 @@ namespace amsocr
         private int HandleWM_COPYDATA(IntPtr hwnd, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             try {
-                COPYDATASTRUCT cds = (COPYDATASTRUCT)Marshal.PtrToStructure(lParam, typeof(COPYDATASTRUCT));
+                COPYDATASTRUCT? cdsNullable = Marshal.PtrToStructure<COPYDATASTRUCT>(lParam);
+                if (cdsNullable == null)
+                {
+                    handled = false;
+                    return 0;
+                }
+                COPYDATASTRUCT cds = cdsNullable.Value;
 
                 handled = true;
                 switch ((int)cds.dwData){
@@ -283,7 +289,7 @@ namespace amsocr
         }
         private async Task<SoftwareBitmap> ConvertSoftwareBitmap(System.Windows.Controls.Image image)
         {
-            SoftwareBitmap sbitmap = null;
+            SoftwareBitmap? sbitmap = null;
 
             using (MemoryStream stream = new MemoryStream())
             {
@@ -323,7 +329,7 @@ namespace amsocr
 #endif
             }
 
-            return sbitmap;
+            return sbitmap!;
         }
 
         // ------------ amodi移植部分 --------------------- //
@@ -364,8 +370,8 @@ namespace amsocr
         [DllImport("User32.dll", EntryPoint = "FindWindow")]
         public static extern Int32 FindWindow(String lpClassName, String lpWindowName);
 
-        System.IO.FileSystemWatcher fsw;
-        Queue<string> FileNameQue;
+        System.IO.FileSystemWatcher fsw = null!;
+        Queue<string> FileNameQue = null!;
 
         // parser output //
         int CurLoc;	// mouse cursor position in text.
@@ -400,7 +406,7 @@ namespace amsocr
         {
             fsw.EnableRaisingEvents = false;
             fsw.Dispose();
-            fsw = null;
+            fsw = null!;
         }
         private bool DoingOCR = false;
         private async Task<OcrResult> doOcrExec()
@@ -591,45 +597,6 @@ namespace amsocr
             var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
             PostMessage(hwnd, WM_EXEC_OCR, IntPtr.Zero, IntPtr.Zero);
         }
-
-        private void __oldExecOCR(string filename)
-        {
-            var result = DoOCR(filename);
-            if (result.Result != "")
-            {
-                string textname = filename + ".txt";
-                for (int i = 0; i < 10; i++)
-                {
-                    try
-                    {
-                        StreamWriter writer = new StreamWriter(textname, false, System.Text.Encoding.GetEncoding("utf-16"));
-                        writer.WriteLine(CurLoc.ToString());
-                        writer.Write(result.Result);
-                        writer.Close();
-                    }
-                    catch
-                    {
-                        tbInfo.AppendText("Write Error:" + textname + "\r\n");
-                        System.Threading.Thread.Sleep(30);
-                        continue;
-                    }
-                    break;
-                }
-            }
-            if (!(miDebugMode?.IsChecked ?? false))
-            {
-                try
-                {
-                    System.IO.File.Delete(filename);
-                }
-                catch
-                {
-                    // 連続して.bmpファイルが作られているため
-                    tbInfo.AppendText("Delete Error:" + filename + "\r\n");
-                }
-            }
-        }
-
         private async Task ExecOCR(string filename)
         {
             try
