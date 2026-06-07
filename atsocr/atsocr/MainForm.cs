@@ -116,13 +116,15 @@ namespace atsocr
             {
                 filename = SelectImageFromDirectory();
             }
+            TesseractEngine engine = null;
+            Tesseract.Page page = null;
             for (int i = 0; i < 10; i++){
                 try {
-                    var engine = new TesseractEngine(TESSDATA_DIR, "eng");
+                    engine = new TesseractEngine(TESSDATA_DIR, "eng");
                     using (var pix = Pix.LoadFromFile(filename))
                     {
                         DBW("DoOCR:OCR");
-                        var page = engine.Process(pix);
+                        page = engine.Process(pix);
                         // 結果表示
                         DBW("DoOCR:Completed");
                         tbText.Text = page.GetText();
@@ -135,12 +137,12 @@ namespace atsocr
                 }
                 break;
             }
-#if false
             const int UnderGap = MARGIN_UNDER_CLICK; // 単語のある領域より少し下のpointでも検索対象と認識する空白部分(Y方向)
             int last_x = 0;
             int lineno = 0;
 			CurLoc = 0;
             lbPoint.Text = "" + CursorPoint.X + "," + CursorPoint.Y;
+#if false
             tbInfo.AppendText("Page:" + md.Images.Count + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
             for (int i = 0; i < md.Images.Count; i++)
             {
