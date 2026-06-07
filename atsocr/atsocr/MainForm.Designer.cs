@@ -123,6 +123,7 @@
             this.miCapturePage.Name = "miCapturePage";
             this.miCapturePage.Size = new System.Drawing.Size(293, 22);
             this.miCapturePage.Text = "Capture &Page";
+            this.miCapturePage.Click += new System.EventHandler(this.miCapturePage_Click);
             // 
             // miUseDefLang
             // 
@@ -135,6 +136,7 @@
             this.miDebugMode.Name = "miDebugMode";
             this.miDebugMode.Size = new System.Drawing.Size(293, 22);
             this.miDebugMode.Text = "&Debug Mode";
+            this.miDebugMode.Click += new System.EventHandler(this.miDebugMode_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -147,6 +149,7 @@
             this.miExit.ShortcutKeyDisplayString = "Ctrl+W";
             this.miExit.Size = new System.Drawing.Size(293, 22);
             this.miExit.Text = "E&xit";
+            this.miExit.Click += new System.EventHandler(this.miExit_Click);
             // 
             // lbPoint
             // 
@@ -163,6 +166,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(297, 381);
+            this.ContextMenuStrip = this.contextMenuStrip1;
             this.Controls.Add(this.tbInfo);
             this.Controls.Add(this.lbStatus);
             this.Controls.Add(this.tbText);
