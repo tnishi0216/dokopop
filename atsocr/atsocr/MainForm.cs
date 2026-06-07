@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.InteropServices;
+using Tesseract;
 
 namespace atsocr
 {
     public partial class AutoTSOCRMainForm : Form
     {
+        const string TESSDATA_DIR = "./tessdata";
 
-		const int MARGIN_UNDER_CLICK = 2;	// 次の行までの空白
+        const int MARGIN_UNDER_CLICK = 2;	// 次の行までの空白
 
         const int WM_COPYDATA = 0x4A;
         const int WM_APP = 0x8000;
@@ -113,33 +112,30 @@ namespace atsocr
             lbStatus.Text = "Recognizing... " + filename;
             tbText.Text = "";
             tbInfo.Text = "";
+            if (filename == "")
+            {
+                filename = SelectImageFromDirectory();
+            }
             for (int i = 0; i < 10; i++){
                 try {
-                    md.Create(filename);
+                    var engine = new TesseractEngine(TESSDATA_DIR, "eng");
+                    using (var pix = Pix.LoadFromFile(filename))
+                    {
+                        DBW("DoOCR:OCR");
+                        var page = engine.Process(pix);
+                        // 結果表示
+                        DBW("DoOCR:Completed");
+                        tbText.Text = page.GetText();
+                    }
                 } catch {
-                    tbInfo.AppendText("ATSOCR Create failure: " + filename + "\r\n");
-                    DBW("ATSOCR Create file failure: " + filename);
+                    tbInfo.AppendText("ATSOCR Create failure (No tessdata?): " + filename + "\r\n");
+                    DBW("ATSOCR Create failure (No tessdata?): " + filename);
                     System.Threading.Thread.Sleep(30);
                     continue;
                 }
                 break;
             }
-            DBW("DoOCR:OCR");
-            try {
-				if (miUseDefLang.Checked){
-					md.OCR(ATSOCR.MiLANGUAGES.miLANG_SYSDEFAULT, true, true);
-				} else {
-					md.OCR(ATSOCR.MiLANGUAGES.miLANG_ENGLISH, true, true);
-				}
-            } catch {
-                DBW("ATSOCR OCR Error: " + filename);
-                md.Close();
-                DBW("DoOCR:Closed");
-                lbStatus.Text = "OCR Error: " + filename;
-                DoingOCR = false;
-                return false;
-            }
-            DBW("DoOCR:Completed");
+#if false
             const int UnderGap = MARGIN_UNDER_CLICK; // 単語のある領域より少し下のpointでも検索対象と認識する空白部分(Y方向)
             int last_x = 0;
             int lineno = 0;
@@ -217,7 +213,7 @@ namespace atsocr
                     }
                 }
             }
-            md.Close(false);
+#endif
             lbStatus.Text = "Done. " + filename;
             DoingOCR = false;
             return true;
@@ -396,6 +392,42 @@ namespace atsocr
 		{
 			miUseDefLang.Checked = !miUseDefLang.Checked;
 		}
+
+        private string SelectImageFromDirectory()
+        {
+            string directory = "c:\\temp\\atsocr";
+            
+            try
+            {
+                if (!System.IO.Directory.Exists(directory))
+                {
+                    MessageBox.Show("Directory not found: " + directory);
+                    return "";
+                }
+
+                var imgFiles = System.IO.Directory.GetFiles(directory, "*.jpg");
+
+                if (imgFiles.Length == 0){
+                    imgFiles = System.IO.Directory.GetFiles(directory, "*.png");
+                    if (imgFiles.Length == 0){
+                        imgFiles = System.IO.Directory.GetFiles(directory, "*.bmp");
+                        if (imgFiles.Length == 0){
+                            MessageBox.Show("No JPG/PNG/BMP files found in " + directory);
+                            return "";
+                        }
+                    }
+                }
+
+                // 最初に見つかったファイルを返す
+                return imgFiles[0];
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+
+            return "";
+        }
 
         static int hWin = 0;
         void DBW( string msg )
