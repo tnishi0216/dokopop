@@ -100,9 +100,9 @@ namespace atsocr
         }
 
         private bool DoingOCR = false;
-        bool DoOCR(string filename)
+        string DoOCR(string filename)
         {
-            if (DoingOCR) return false;
+            if (DoingOCR) return "";
             DoingOCR = true;
 
             bool capture_page = miCapturePage.Checked;
@@ -138,14 +138,14 @@ namespace atsocr
                 break;
             }
             if (engine==null || page==null){
-                return false;
+                return "";
             }
             const int UnderGap = MARGIN_UNDER_CLICK; // 単語のある領域より少し下のpointでも検索対象と認識する空白部分(Y方向)
             int last_x = 0;
             int lineno = 0;
 			CurLoc = 0;
             lbPoint.Text = "" + CursorPoint.X + "," + CursorPoint.Y;
-#if true
+            String ocrText = "";
             int boxcount = 0;  // interatorしかないので取得できないらしい
             tbInfo.AppendText("Page:" + boxcount + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
             using (var iter = page.GetIterator())
@@ -187,10 +187,10 @@ namespace atsocr
 									curLocSet = true;
 	                                if (prevWord.Length != 0) {
 										if (NumPrevWords >= 2 && prevWord2.Length != 0){
-											tbText.AppendText(prevWord2 + " " + prevWord + " ");
+											ocrText += prevWord2 + " " + prevWord + " ";
                                             CurLoc = prevWord2.Length + 1 + prevWord.Length + 1;
 										} else {
-		                                    tbText.AppendText(prevWord + " ");
+		                                    ocrText += prevWord + " ";
                                             CurLoc = prevWord.Length + 1;
                                         }
 	                                }
@@ -208,7 +208,7 @@ namespace atsocr
                         }
 
                         if (last_x > rc.X1){
-                            if (tbText.Text!="")
+                            if (ocrText != "")
                                 cr = true;
                             lineno++;
                         }
@@ -216,94 +216,20 @@ namespace atsocr
 
                         if (outok){
                             if (cr){
-                                tbText.AppendText("\r\n");
+                                ocrText += "\r\n";
                                 if (curLocSet)
                                     CurLoc += 2;	// CR+LF
                             }
 
-                            tbText.AppendText(word + " ");
+                            ocrText += word + " ";
                         }
                     }
 
                 } while (iter.Next(PageIteratorLevel.Word));
             }
-#else
-            tbInfo.AppendText("Page:" + md.Images.Count + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
-            for (int i = 0; i < md.Images.Count; i++)
-            {
-                ATSOCR.Image image = (ATSOCR.Image)md.Images[i];
-                ATSOCR.Layout layout = image.Layout;
-				bool outok = capture_page;
-				string prevWord = "";
-				string prevWord2 = "";
-				for (int j = 0; j < layout.Words.Count; j++)
-                {
-                    ATSOCR.Word word = (ATSOCR.Word)layout.Words[j];
-                    bool cr = false;
-                    bool curLocSet = false;
-
-                    for (int k = 0; k < word.Rects.Count; k++)
-                    {
-                        ATSOCR.MiRect rc = (ATSOCR.MiRect)word.Rects[k];
-                        int h = rc.Bottom - rc.Top;
-                        int w = rc.Right - rc.Left;
-
-                        //bool incursor;
-						//tbText.AppendText(word.Text + " (" + rc.Left + "," + rc.Top+ ")\r\n");
-                        if (CursorPoint.Y >= rc.Top && CursorPoint.Y <= rc.Bottom+UnderGap){
-                            //incursor = true;
-							if (!outok)
-							{
-                                if (CursorPoint.X < rc.Left	// cursorを飛び越えた
-                                	|| (CursorPoint.X >= rc.Left && CursorPoint.X <= rc.Right)	// cursorが矩形内
-                                	){
-                                    outok = true;
-									curLocSet = true;
-	                                if (prevWord.Length != 0) {
-										if (NumPrevWords >= 2 && prevWord2.Length != 0){
-											tbText.AppendText(prevWord2 + " " + prevWord + " ");
-                                            CurLoc = prevWord2.Length + 1 + prevWord.Length + 1;
-										} else {
-		                                    tbText.AppendText(prevWord + " ");
-                                            CurLoc = prevWord.Length + 1;
-                                        }
-	                                }
-                                } else {
-									prevWord2 = prevWord;
-									prevWord = word.Text;
-								}
-							}
-                        } else {
-                            //incursor = false;
-                        }
-
-                        if (outok){
-                            tbInfo.AppendText(word.Text + " (" + w + "x" + h + ":" + rc.Left + "," + rc.Top + ")\r\n");
-                        }
-
-                        if (last_x > rc.Left){
-                            if (tbText.Text!="")
-                                cr = true;
-                            lineno++;
-                        }
-                        last_x = rc.Left;
-                    }
-
-                    if (outok){
-                        if (cr){
-                            tbText.AppendText("\r\n");
-                            if (curLocSet)
-                            	CurLoc += 2;	// CR+LF
-                        }
-
-                        tbText.AppendText(word.Text + " ");
-                    }
-                }
-            }
-#endif
             lbStatus.Text = "Done. " + filename;
             DoingOCR = false;
-            return true;
+            return ocrText;
         }
 		private void ParseFileName(string filename)
 		{
@@ -350,19 +276,21 @@ namespace atsocr
 
         private void ExecOCR(string filename)
         {
-            if (DoOCR(filename)) {
+            string ocrText = DoOCR(filename);
+            if (ocrText != "") {
                 string textname = filename + ".txt";
                 for (int i = 0; i < 10; i++) {
                     try {
                         StreamWriter writer = new StreamWriter(textname, false, System.Text.Encoding.GetEncoding("utf-16"));
                         writer.WriteLine(CurLoc.ToString());
-                        writer.Write(tbText.Text);
+                        writer.Write(ocrText);
                         writer.Close();
                     } catch {
                         tbInfo.AppendText("Write Error:" + textname + "\r\n");
                         System.Threading.Thread.Sleep(30);
                         continue;
                     }
+                    DBW("ocrText="+ocrText);
                     break;
                 }
             }
