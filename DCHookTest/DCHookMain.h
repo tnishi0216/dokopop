@@ -66,8 +66,6 @@ __published:	// IDE 管理のコンポーネント
 	TMenuItem *N2;
 	TMenuItem *miConfig;
 	TMenuItem *miInstallMODI;
-	TTimer *tmMODIInstallCheck;
-	TTimer *tmMODINotify;
 	TMenuItem *miCheckLatest;
 	TMenuItem *miOCRText;
 	TTimer *tmReInit;
@@ -102,8 +100,6 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall miIncSearchClick(TObject *Sender);
 	void __fastcall tmMouseMoveTimer(TObject *Sender);
 	void __fastcall miConfigClick(TObject *Sender);
-	void __fastcall tmMODIInstallCheckTimer(TObject *Sender);
-	void __fastcall tmMODINotifyTimer(TObject *Sender);
 	void __fastcall miCheckLatestClick(TObject *Sender);
 	void __fastcall miOCRTextClick(TObject *Sender);
 	void __fastcall tmReInitTimer(TObject *Sender);
@@ -123,14 +119,13 @@ private:	// ユーザー宣言
 	bool CtrlClose;
 	bool IgnoreJ;
 	bool Banner;
-	int CaptureMode;	// 0:conventional 1:use AMODI
-	bool AMODIAvail;	// AMODI available or not
-	AnsiString AMODIPath;
+	int CaptureMode;	// 0:conventional 1:use ATSOCR
+	bool ATSOCRAvail;	// ATSOCR available or not
 	bool MouseIncSrch;
 public:		// ユーザー宣言
 	__fastcall TDCHookMainForm(TComponent* Owner);
 	void EvCopyData(TMessage&);
-	void InitAMODI();
+	void InitATSOCR();
 	void Start();
 	void MenuClosed();
 	void ShowNotify();
@@ -146,7 +141,7 @@ public:		// ユーザー宣言
 	POINT CursorPoint;
 	void SetupConfig();
 	void SetupConfig2();
-	void SetupAMODI();
+	void SetupATSOCR();
 	bool EnablePopup;
 	bool DoPopup( const tchar *text, int click_pos, const tchar *prevtext, bool movesend );
 	tchar *PopupText;
@@ -175,10 +170,7 @@ public:		// ユーザー宣言
 	HWND FindPdic( );
 	LRESULT SendCopyData( HWND hwnd, int message, const char *str );
 
-	void NotifyAMODI();
-
 	void Reboot();
-	
 protected:
 	BEGIN_MESSAGE_MAP
 		VCL_MESSAGE_HANDLER(WM_COPYDATA, TMessage, EvCopyData)

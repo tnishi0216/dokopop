@@ -74,10 +74,10 @@ void SaveForm( const char *section, TForm *form, HWND hwnd );
 /*------------------------------------------*/
 bool LaunchPdic();
 bool MODIInstalled();
-bool AMODIRunable();
-bool LaunchAMODI();
-void TerminateAMODI();
-void ShowAMODI();
+bool ATSOCRRunable();
+bool LaunchATSOCR();
+void TerminateATSOCR();
+void ShowATSOCR();
 
 bool CheckPassword( const char *str );
 void CheckWOW64();
@@ -89,12 +89,13 @@ HANDLE WinExecEx( const char *cmd, int show, const char *dir=NULL, const char *t
 HWND FindApp(const char *clsname, const char *wndname, const char *appname);
 HWND FindPrev();
 int CheckVersion(HWND hwnd);
-HWND FindAMODI();
+HWND FindATSOCR();
 HWND FindPopupWindow( );
 
 void ShowManual( HWND hwnd );
 void ShowLatestVersion();
 
+void GetWindowsVersion(DWORD* majorVersion, DWORD* minorVersion, DWORD* buildNumber);
 unsigned GetDNFVersion();	// get .NET Framework version
 
 void dbw( const char *format, ... );

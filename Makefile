@@ -23,9 +23,13 @@ copy_bin:
 	$(CPI) DCHookTest\DKPUHK.dll ind\DKPUHK.dll
 	$(CPI) DCHookTest\DKPUHK64.DLL ind\DKPUHK64.dll
 	$(CPI) DCHookTest\DKPUHK64.exe ind\DKPUHK64.exe
-	$(CPI) DCHookTest\amodi.exe ind\amodi.exe
-	$(CPI) bin\Interop.MODI.dll ind\Interop.MODI.dll
-	$(CPI) bin\ExMODIst.exe ind\ExMODIst.exe
+	$(CPI) DCHookTest\atsocr.exe ind\atsocr.exe
+	$(CPI) DCHookTest\atsocr.exe.config ind\atsocr.exe.config
+	$(CPI) DCHookTest\Tesseract.dll ind\Tesseract.dll
+	$(CPI) DCHookTest\x86\leptonica-1.82.0.dll ind\x86\leptonica-1.82.0.dll
+	$(CPI) DCHookTest\x86\tesseract50.dll ind\x86\tesseract50.dll
+	$(CPI) DCHookTest\x64\leptonica-1.82.0.dll ind\x64\leptonica-1.82.0.dll
+	$(CPI) DCHookTest\x64\tesseract50.dll ind\x64\tesseract50.dll
 	$(CPI) DCHookTest\DCHookTest.exe ind\DKPu.exe
 	$(CPI) DKPU.TXT ind\DKPu.txt
 

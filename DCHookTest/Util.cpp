@@ -19,8 +19,8 @@ const char APPNAME[] = {"DokoPop/Unicode"};
 const char APPNAME[] = {"DokoPop"};
 #endif
 
-const char *AMODI_EXE_PATH = "amodi.exe";
-//const char *AMODI_EXE_PATH = "\\src\\amodi\\amodi\\bin\\Debug\\amodi.exe";
+const char *ATSOCR_EXE_PATH = "atsocr.exe";
+//const char *ATSOCR_EXE_PATH = "\\src\\atsocr\\atsocr\\bin\\Debug\\atsocr.exe";
 
 const char *EXMODIST_EXE_PATH = "ExMODIst.exe";
 
@@ -484,13 +484,13 @@ bool MODIInstalled()
 	}
 	return false;
 }
-bool AMODIRunable()
+bool ATSOCRRunable()
 {
-	return MODIInstalled() && GetDNFVersion()>=451;
+	return true;
 }
-bool LaunchAMODI()
+bool LaunchATSOCR()
 {
-	if (!AMODIRunable()) return false;
+	if (!ATSOCRRunable()) return false;
 
 	int show = 
 #ifdef _DEBUG
@@ -498,28 +498,28 @@ bool LaunchAMODI()
 #else
 		SW_HIDE;
 #endif
-	if (!_WinExec( AMODI_EXE_PATH, show, 300))
+	if (!_WinExec( ATSOCR_EXE_PATH, show, 300))
 		return false;
 
 	HWND hwnd = NULL;
 	for (int i=0;i<10;i++){
-		hwnd = FindAMODI();
+		hwnd = FindATSOCR();
 		if (hwnd)
 			break;
 		Sleep(10);
 	}
 	return hwnd!=NULL;
 }
-void TerminateAMODI()
+void TerminateATSOCR()
 {
-	HWND hwnd = FindAMODI();
+	HWND hwnd = FindATSOCR();
 	if (hwnd){
 		PostMessage(hwnd, WM_CLOSE, 0, 0);
 	}
 }
-void ShowAMODI()
+void ShowATSOCR()
 {
-	HWND hwnd = FindAMODI();
+	HWND hwnd = FindATSOCR();
 	if (hwnd){
 		ShowWindow(hwnd, SW_SHOW);
 		ShowWindow(hwnd, SW_RESTORE);
@@ -581,10 +581,10 @@ int CheckVersion(HWND hwnd)
 	if (ver==0){ return -1; }	// older than ver.2.0
 	return ver - VersionValue;
 }
-HWND FindAMODI()
+HWND FindATSOCR()
 {
-	static const char APPNAME_AMODI[] =  "Auto MODI";
-	return FindApp(NULL, APPNAME_AMODI, APPNAME_AMODI);
+	static const char APPNAME_ATSOCR[] =  "Auto TSOCR";
+	return FindApp(NULL, APPNAME_ATSOCR, APPNAME_ATSOCR);
 }
 static HWND hwndFound;
 static BOOL CALLBACK EnumWindowsProcPS( HWND hwnd, LPARAM lParam )
@@ -620,6 +620,35 @@ void ShowLatestVersion()
 	const char *url = "http://dokopop.osdn.jp/";
 #endif
 	ShellExecute( NULL, _T("open"), url, NULL, NULL, SW_SHOW );
+}
+
+// 参考
+// https://qiita.com/yamoridon/items/0524f0a6930f6b808094
+#define	LOAD_LIBRARY_SEARCH_SYSTEM32	0x00000800	// Windows7 or later
+//typedef NTSTATUS(WINAPI*)(PRTL_OSVERSIONINFOW lpVersionInformation);
+typedef int NTSTATUS;
+typedef NTSTATUS (WINAPI *FNRtlGetVersion)(PRTL_OSVERSIONINFOW lpVersionInformation);
+void GetWindowsVersion(DWORD* majorVersion, DWORD* minorVersion, DWORD* buildNumber)
+{
+	DWORD major = 0;
+	DWORD minor = 0;
+	DWORD build = 0;
+	HMODULE ntdll = LoadLibraryExW(L"ntdll.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+	if (ntdll){
+		FNRtlGetVersion rtlGetVersion = (FNRtlGetVersion)GetProcAddress(ntdll, "RtlGetVersion");
+		if (rtlGetVersion) {
+			RTL_OSVERSIONINFOW versionInfo = {};
+			versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
+			rtlGetVersion(&versionInfo);
+			major = versionInfo.dwMajorVersion;
+			minor = versionInfo.dwMinorVersion;
+			build = versionInfo.dwBuildNumber;
+		}
+		FreeLibrary(ntdll);
+	}
+	if (majorVersion) *majorVersion = major;
+	if (minorVersion) *minorVersion = minor;
+	if (buildNumber) *buildNumber = build;
 }
 
 // 参考

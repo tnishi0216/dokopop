@@ -14,7 +14,6 @@ TPopupConfigDlg *PopupConfigDlg;
 __fastcall TPopupConfigDlg::TPopupConfigDlg(TComponent* Owner)
 	: TForm(Owner)
 {
-	MODIAvail = true;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::cbGroupOpenClick(TObject *Sender)
@@ -70,16 +69,13 @@ void __fastcall TPopupConfigDlg::FormCloseQuery(TObject *Sender,
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::cbCaptureModeChange(TObject *Sender)
 {
-	bool f = cbCaptureMode->ItemIndex != 2;
 #if 0
+	bool f = cbCaptureMode->ItemIndex != 2;
 	lbScaling->Enabled = f;
 	lbScaleNormal->Enabled = f;
 	tbScaling->Enabled = f;
 	lbScaleMax->Enabled = f;
 #endif
-	lbAMODIPath->Enabled = f;
-	edAMODIPath->Enabled = f;
-	btnBrowse->Enabled = f;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::btnHelpClick(TObject *Sender)
@@ -94,12 +90,12 @@ void __fastcall TPopupConfigDlg::actHelpExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::lbDebugDblClick(TObject *Sender)
 {
-	miShowAMODI->Visible = true;
+	miShowATSOCR->Visible = true;
 }
 //---------------------------------------------------------------------------
-void __fastcall TPopupConfigDlg::miShowAMODIClick(TObject *Sender)
+void __fastcall TPopupConfigDlg::miShowATSOCRClick(TObject *Sender)
 {
-	ShowAMODI();
+	ShowATSOCR();
 }
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::cbDPISettingClick(TObject *Sender)

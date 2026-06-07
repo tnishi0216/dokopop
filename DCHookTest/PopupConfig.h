@@ -34,9 +34,6 @@ __published:	// IDE 管理のコンポーネント
 	TLabel *Label2;
 	TComboBox *cbToggleKey;
 	TCheckBox *cbIgnoreJ;
-	TLabel *lbAMODIPath;
-	TEdit *edAMODIPath;
-	TButton *btnBrowse;
 	TLabel *lbScaling;
 	TTrackBar *tbScaling;
 	TLabel *lbScaleNormal;
@@ -46,7 +43,7 @@ __published:	// IDE 管理のコンポーネント
 	TAction *actHelp;
 	TLabel *lbDebug;
 	TPopupMenu *pmDebugMenu;
-	TMenuItem *miShowAMODI;
+	TMenuItem *miShowATSOCR;
 	TComboBox *cbCaptureMode;
 	TCheckBox *cbUse64;
 	TCheckBox *cbDPISetting;
@@ -56,11 +53,10 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall btnHelpClick(TObject *Sender);
 	void __fastcall actHelpExecute(TObject *Sender);
 	void __fastcall lbDebugDblClick(TObject *Sender);
-	void __fastcall miShowAMODIClick(TObject *Sender);
+	void __fastcall miShowATSOCRClick(TObject *Sender);
 	void __fastcall cbCaptureModeChange(TObject *Sender);
 	void __fastcall cbDPISettingClick(TObject *Sender);
 private:	// ユーザー宣言
-	bool MODIAvail;
 public:		// ユーザー宣言
 	__fastcall TPopupConfigDlg(TComponent* Owner);
 	void SetPopupKey( int keycomb );
@@ -71,7 +67,6 @@ public:		// ユーザー宣言
 	bool GetDPIDetect();
 	void SetScaler(int scale);
 	int GetScaler();
-	void SetMODIAvail(bool avail) { MODIAvail = avail; }
 	void SetCaptureMode(int mode);
 	int GetCaptureMode();
 };

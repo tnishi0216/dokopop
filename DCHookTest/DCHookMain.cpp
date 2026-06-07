@@ -10,7 +10,6 @@
 #include "Notify.h"
 #include "DCHookLoader.h"
 #include "prgprof.h"
-#include "MODINotifyDlg.h"
 #include "prgconfig.h"
 #include "OCRTextFrm.h"
 #include "MonitorScale.h"
@@ -41,12 +40,10 @@
 /*------------------------------------------*/
 /*		Definitions							*/
 /*------------------------------------------*/
-#define	URL_MODI_INSTALL	"http://support.microsoft.com/kb/982760"
-
 #define	DEF_POPUPKEY		(KF_CONTROL)
 #define	DEF_TOGGLEKEY		(KF_CONTROL+KF_MENU)
 
-#define	WM_AMODI			(WM_APP+0x400)	// app communication message with AMODI
+#define	WM_ATSOCR			(WM_APP+0x400)	// app communication message with ATSOCR
 
 #define	FLG_MOVESEND		0x40000000	// mouse move send
 
@@ -93,7 +90,7 @@ __fastcall TDCHookMainForm::TDCHookMainForm(TComponent* Owner)
 	PopupText = NULL;
 	DoPopupRetry = 0;
 	CaptureMode = CM_TEXT | CM_IMAGE;
-	AMODIAvail = false;
+	ATSOCRAvail = false;
 	MouseIncSrch = false;
 }
 //---------------------------------------------------------------------------
@@ -173,7 +170,7 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	//TODO: default=ONにすると不安定になるのでしばらくdef=false
 	//MouseIncSrch = Ini->ReadInteger( PFS_CONFIG, PFS_INCSRCH, MouseIncSrch );
 	CaptureMode = Ini->ReadInteger( PFS_CONFIG, PFS_CAPTURE_MODE, CaptureMode );
-	InitAMODI();
+	InitATSOCR();
 	btnOK->Left = (SavedWidth - btnOK->Width)>>1;
 	btnOK->Top = Height - btnOK->Height - 8;
 	lbVersion->Caption = StrVersion;
@@ -181,19 +178,13 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	lbVersion->Top = btnOK->Top;
 	
 	BootTimer->Enabled = true;
-
-	if (!AMODIAvail && (CaptureMode & CM_IMAGE)){
-		tmMODINotify->Enabled = true;
-	}
-
-//	Application->OnIdle = IdleHandler;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
 	  bool &CanClose)
 {
-	if (AMODIAvail){
-		TerminateAMODI();
+	if (ATSOCRAvail){
+		TerminateATSOCR();
 	}
 	if (OCRTextForm){
 		OCRTextForm->Visible = false;
@@ -230,15 +221,6 @@ void __fastcall TDCHookMainForm::FormKeyPress(TObject *Sender, char &Key)
 	}
 #endif
 }
-#if 0
-void __fastcall TDCHookMainForm::IdleHandler(TObject *sender, bool &done)
-{
-	if (NotifyAMODIEnabled){
-		NotifyAMODIEnabled = false;
-		NotifyAMODI();
-	}
-}
-#endif
 //---------------------------------------------------------------------------
 // Menu event
 //---------------------------------------------------------------------------
@@ -271,19 +253,6 @@ void __fastcall TDCHookMainForm::miIncSearchClick(TObject *Sender)
 		}
 	}
 }
-//---------------------------------------------------------------------------
-#if 0	// change capture mode
-	if (!AMODIAvail && (CaptureMode & CM_IMAGE)){
-		InitAMODI();
-	}
-	if (AMODIAvail){
-		SetupConfig2();
-	} else {
-		NotifyAMODI();
-	}
-
-	MenuClosed();
-#endif
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::miEnablePopupClick(TObject *Sender)
 {
@@ -319,11 +288,8 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 	PopupConfigDlg->cbCtrlClose->Checked = CtrlClose;
 	PopupConfigDlg->cbIgnoreJ->Checked = IgnoreJ;
 	PopupConfigDlg->cbBanner->Checked = Banner;
-	bool useAMODI = CaptureMode & CM_IMAGE ? true : false;
 	PopupConfigDlg->SetCaptureMode( CaptureMode );
 	PopupConfigDlg->SetScaler( Ini->ReadInteger(PFS_CONFIG, PFS_SCALE, 0) );
-	PopupConfigDlg->edAMODIPath->Text = AMODIPath;
-	PopupConfigDlg->SetMODIAvail( AMODIAvail );
 	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, DEF_USE64);
 	PopupConfigDlg->cbUse64->Checked = use64;
 	SetForegroundWindow( PopupConfigDlg->Handle );
@@ -333,7 +299,6 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 		CtrlClose = PopupConfigDlg->cbCtrlClose->Checked;
 		IgnoreJ = PopupConfigDlg->cbIgnoreJ->Checked;
 		Banner = PopupConfigDlg->cbBanner->Checked;
-		AMODIPath = PopupConfigDlg->edAMODIPath->Text;
 		Ini->WriteInteger( PFS_CONFIG, PFS_POPUPKEY,
 			PopupConfigDlg->GetPopupKey() );
 		Ini->WriteInteger( PFS_CONFIG, PFS_TOGGLEKEY,
@@ -341,15 +306,10 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 		CaptureMode = PopupConfigDlg->GetCaptureMode();
 		Ini->WriteInteger( PFS_CONFIG, PFS_CAPTURE_MODE, CaptureMode );
 		Ini->WriteInteger( PFS_CONFIG, PFS_SCALE, PopupConfigDlg->GetScaler() );
-		Ini->WriteString(PFS_CONFIG, PFS_AMODIPATH, AMODIPath.c_str());
 		Ini->WriteInteger(PFS_CONFIG, PFS_USE64, PopupConfigDlg->cbUse64->Checked);
 		SaveConfig();
 		SetupConfig();
 		tmReInit->Enabled = false;
-		if (!useAMODI && (CaptureMode & CM_IMAGE) && !AMODIAvail){
-			// AMODI off->ON かつ AMODIがいない場合
-			NotifyAMODI();
-		}
 		if (PopupConfigDlg->cbUse64->Checked != use64){
 			// 64bit hook 変更時
 			Unhook();
@@ -427,9 +387,6 @@ void __fastcall TDCHookMainForm::miTestClick(TObject *Sender)
 #ifdef _DEBUG
 #if 1
 	hDll->Init32(Handle);
-#endif
-#if 0
-	NotifyAMODI();
 #endif
 #if 0
 	miIncSearchClick(Sender);
@@ -558,40 +515,15 @@ void __fastcall TDCHookMainForm::tmMouseMoveTimer(TObject *Sender)
 	hDll->CaptureAsync();
 }
 //---------------------------------------------------------------------------
-void __fastcall TDCHookMainForm::tmMODIInstallCheckTimer(TObject *Sender)
-{
-	if (MODIInstalled()){
-#if 0
-		Reboot();
-#else
-		// 最初のpopupで落ちてしまう？
-		if (!AMODIAvail && (CaptureMode & CM_IMAGE)){
-			InitAMODI();
-		}
-		if (AMODIAvail){
-			SetupConfig2();
-		}
-#endif
-	}
-}
-//---------------------------------------------------------------------------
-void __fastcall TDCHookMainForm::tmMODINotifyTimer(TObject *Sender)
-{
-	tmMODINotify->Enabled = false;
-	if (!AMODIRunable()){
-		NotifyAMODI();
-	}
-}
-//---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::tmReInitTimer(TObject *Sender)
 {
 	// amodi.exeのlaunchに非常に時間がかかる場合がある
 	// ex.古いPCでstartupに登録している場合
 	//    →input idleになってもmain windowの生成に時間がかかっているのかもしれない
-	// AMODIAvailがtrueになるまで初期化を続ける
+	// ATSOCRAvailがtrueになるまで初期化を続ける
 	tmReInit->Enabled = false;
-	SetupAMODI();
-	if (AMODIAvail){
+	SetupATSOCR();
+	if (ATSOCRAvail){
 		SetupConfig2();
 	}
 }
@@ -629,10 +561,9 @@ void __fastcall TDCHookMainForm::ImageMouseUp(TObject *Sender,
 //---------------------------------------------------------------------------
 // User Functions
 //---------------------------------------------------------------------------
-void TDCHookMainForm::InitAMODI()
+void TDCHookMainForm::InitATSOCR()
 {
-	AMODIPath = Ini->ReadString(PFS_CONFIG, PFS_AMODIPATH, AMODIPath.c_str());
-	SetupAMODI();
+	SetupATSOCR();
 }
 void TDCHookMainForm::Start()
 {
@@ -871,9 +802,9 @@ void TDCHookMainForm::EvCopyData(TMessage& msg )
 			}
 			msg.Result = (memcmp( cds->lpData, APPNAME, strlen(APPNAME)+1 ) == 0);
 			return;
-		case DCH_LAUNCH_AMODI:
-			SetupAMODI();
-			//Reboot();		// AMODI.exe再起動では解決できないため
+		case DCH_LAUNCH_ATSOCR:
+			SetupATSOCR();
+			//Reboot();		// ATSOCR.exe再起動では解決できないため
 			break;
 	}
 	return;
@@ -1370,7 +1301,7 @@ void TDCHookMainForm::SetupConfig()
 
 		SetupConfig2();
 	}
-	SetupAMODI();
+	SetupATSOCR();
 }
 void TDCHookMainForm::SetupConfig2()
 {
@@ -1379,13 +1310,10 @@ void TDCHookMainForm::SetupConfig2()
 
 	TDCHConfig cfg;
 	memset(&cfg, 0, sizeof(cfg));
-	cfg.UseAMODI = AMODIAvail && (CaptureMode & CM_IMAGE);
-	cfg.OnlyAMODI = AMODIAvail && !(CaptureMode & CM_TEXT);
+	cfg.UseATSOCR = ATSOCRAvail && (CaptureMode & CM_IMAGE);
+	cfg.OnlyATSOCR = ATSOCRAvail && !(CaptureMode & CM_TEXT);
 	cfg.MoveSend = MouseIncSrch;
 	//cfg.OnlyImage = 1;	//TODO:
-	if (AMODIPath.data()){
-		strncpy(cfg.AMODIPath, AMODIPath.c_str(), sizeof(cfg.AMODIPath)-1);
-	}
 
 	int dpiDetect = Ini->ReadInteger(PFS_CONFIG, PFS_DPI_DETECT, 1);
 	if (dpiDetect){
@@ -1400,27 +1328,20 @@ void TDCHookMainForm::SetupConfig2()
 	cfg.NumPrevWords = 2;
 	hDll->Config2(&cfg);
 }
-void TDCHookMainForm::SetupAMODI()
+void TDCHookMainForm::SetupATSOCR()
 {
-	if (AMODIPath.data()){
-		AMODIAvail = true;
+	HWND hwnd = FindATSOCR();
+	if (hwnd){
+		ATSOCRAvail = true;
 	} else {
-		HWND hwnd = FindAMODI();
-		if (hwnd){
-			AMODIAvail = true;
-		} else {
-			AMODIAvail = LaunchAMODI();
-			if (!AMODIAvail){
-				HWND hwnd = FindAMODI();
-				if (hwnd)
-					AMODIAvail = true;
-				else
-					tmReInit->Enabled = true;	// retry later
-			}
+		ATSOCRAvail = LaunchATSOCR();
+		if (!ATSOCRAvail){
+			HWND hwnd = FindATSOCR();
+			if (hwnd)
+				ATSOCRAvail = true;
+			else
+				tmReInit->Enabled = true;	// retry later
 		}
-	}
-	if (AMODIAvail){
-		tmMODIInstallCheck->Enabled = false;
 	}
 }
 void TDCHookMainForm::EnableClickOnly( bool enable )
@@ -1490,15 +1411,6 @@ void TDCHookMainForm::ShowNotify()
 	SetWindowPos( NotifyForm->Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE );
 	tmNotify->Enabled = false;
 	tmNotify->Enabled = true;
-}
-void TDCHookMainForm::NotifyAMODI()
-{
-	MODINotifyDialog = new TMODINotifyDialog(this);
-	MODINotifyDialog->ShowModal();
-	if (MODINotifyDialog->LinkClicked || AMODIRunable()){
-		tmMODIInstallCheck->Enabled = true;
-	}
-	delete MODINotifyDialog;
 }
 void TDCHookMainForm::Reboot()
 {

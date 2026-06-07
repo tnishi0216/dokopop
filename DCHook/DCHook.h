@@ -2,14 +2,14 @@
 #define	__DCHOOK_H
 
 struct TDCHConfig {
-	int UseAMODI : 1;
-	int OnlyAMODI : 1;
+	int UseATSOCR : 1;
+	int OnlyATSOCR : 1;
 	int MoveSend : 1;
 	int OnlyImage : 1;
 	int UseNumPrev : 1;
 	int ScaleX;
 	int ScaleY;
-	char AMODIPath[_MAX_PATH];
+	char reserved[_MAX_PATH];	// AMODIPATH
 	unsigned char NumPrevWords;	// UseNumPrev‚ª1‚Ì‚Æ‚«‚Ì‚Ý—LŒø
 	unsigned char reserved1[3];
 };
@@ -44,7 +44,7 @@ typedef unsigned int (WINAPI *FNDebug)();
 
 #define	DCH_MENU		0x1100	// DokoPop Menu
 #define	DCH_TOGGLE		0x1101	// Toggle Click Only
-#define	DCH_LAUNCH_AMODI 0x1102	// Launch AMODI if not alive
+#define	DCH_LAUNCH_ATSOCR 0x1102	// Launch ATSOCR if not alive
 
 /* Do not use 0x12xx!! */
 

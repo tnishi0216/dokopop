@@ -55,15 +55,6 @@ object PopupConfigDlg: TPopupConfigDlg
     Caption = '右ｸﾘｯｸ検索ON/OFF(&R):'
     FocusControl = cbToggleKey
   end
-  object lbAMODIPath: TLabel
-    Left = 27
-    Top = 302
-    Width = 139
-    Height = 12
-    Caption = 'AM&ODIの場所(上級者向け)'
-    Enabled = False
-    FocusControl = edAMODIPath
-  end
   object lbScaling: TLabel
     Left = 40
     Top = 386
@@ -125,7 +116,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 14
+    TabOrder = 12
   end
   object btnCancel: TButton
     Left = 112
@@ -135,7 +126,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 15
+    TabOrder = 13
   end
   object edGroupName: TComboBox
     Left = 136
@@ -232,23 +223,6 @@ object PopupConfigDlg: TPopupConfigDlg
     Caption = '英数字のみ検索する(&J)'
     TabOrder = 7
   end
-  object edAMODIPath: TEdit
-    Left = 24
-    Top = 317
-    Width = 169
-    Height = 20
-    Enabled = False
-    TabOrder = 9
-  end
-  object btnBrowse: TButton
-    Left = 200
-    Top = 314
-    Width = 68
-    Height = 25
-    Caption = '参照...'
-    Enabled = False
-    TabOrder = 10
-  end
   object tbScaling: TTrackBar
     Left = 146
     Top = 383
@@ -262,7 +236,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Position = 0
     SelEnd = 0
     SelStart = 0
-    TabOrder = 13
+    TabOrder = 11
     ThumbLength = 8
     TickMarks = tmBottomRight
     TickStyle = tsAuto
@@ -274,7 +248,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Width = 75
     Height = 25
     Caption = '&Help'
-    TabOrder = 16
+    TabOrder = 14
     OnClick = btnHelpClick
   end
   object cbCaptureMode: TComboBox
@@ -297,7 +271,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Width = 193
     Height = 17
     Caption = '&64ビットフックを使用する'
-    TabOrder = 11
+    TabOrder = 9
     Visible = False
   end
   object cbDPISetting: TCheckBox
@@ -306,7 +280,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Width = 193
     Height = 17
     Caption = '解像度設定をする(&D)'
-    TabOrder = 12
+    TabOrder = 10
     Visible = False
     OnClick = cbDPISettingClick
   end
@@ -322,10 +296,10 @@ object PopupConfigDlg: TPopupConfigDlg
   object pmDebugMenu: TPopupMenu
     Left = 264
     Top = 216
-    object miShowAMODI: TMenuItem
-      Caption = 'Show &AMODI'
+    object miShowATSOCR: TMenuItem
+      Caption = 'Show &ATSOCR'
       Visible = False
-      OnClick = miShowAMODIClick
+      OnClick = miShowATSOCRClick
     end
   end
 end
