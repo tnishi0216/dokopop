@@ -2558,8 +2558,7 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 	}
 	if (!atsocr.IsWindowEnabled()){
 		// ATSOCR died?
-		atsocr.Find(true);
-		if (!atsocr.GetHandle())
+		if (!atsocr.Find(true))
 			return false;
 	}
 	int w = rcTarget.right - rcTarget.left;
