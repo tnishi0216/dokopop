@@ -107,15 +107,15 @@ namespace atsocr
 
             bool capture_page = miCapturePage.Checked;
 
-			ParseFileName(filename);
+            if (filename == ""){
+                filename = SelectImageFromDirectory();
+            }
+
+            ParseFileName(filename);
 
             lbStatus.Text = "Recognizing... " + filename;
             tbText.Text = "";
             tbInfo.Text = "";
-            if (filename == "")
-            {
-                filename = SelectImageFromDirectory();
-            }
             TesseractEngine engine = null;
             Tesseract.Page page = null;
             for (int i = 0; i < 10; i++){
