@@ -137,6 +137,9 @@ namespace atsocr
                 }
                 break;
             }
+            if (engine==null || page==null){
+                return false;
+            }
             const int UnderGap = MARGIN_UNDER_CLICK; // 単語のある領域より少し下のpointでも検索対象と認識する空白部分(Y方向)
             int last_x = 0;
             int lineno = 0;
@@ -516,10 +519,14 @@ namespace atsocr
         static int hWin = 0;
         void DBW( string msg )
         {
-	        if ( hWin==0 ){
+	        if (hWin == 0){
 		        hWin = FindWindow( "TDbgMsgForm", "Debug Messenger" );
-		        if ( hWin==0 ) return;
-	        }
+		        if ( hWin==0)
+                {
+                    hWin = -1;
+                    return;
+                }
+	        } else if (hWin == -1) return;
             byte[] bytearray = System.Text.Encoding.Default.GetBytes(msg);
             int len = bytearray.Length;
 	        COPYDATASTRUCT_send cds;
