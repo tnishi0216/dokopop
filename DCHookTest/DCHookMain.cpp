@@ -733,8 +733,7 @@ void TDCHookMainForm::EvCopyData(TMessage& msg )
 		case DCH_HITTEXT2:	// wide char
 		{
 			DBW("DCH_HITTEXT2");
-			if (PopupText)
-				delete[] PopupText;
+			delete[] PopupText;
 #ifdef USE_UNICODE
 			PopupText = new tchar[ cds->cbData + 1 ];
 			memcpy( PopupText, cds->lpData, cds->cbData );
