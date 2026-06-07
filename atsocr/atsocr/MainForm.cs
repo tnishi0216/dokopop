@@ -142,7 +142,89 @@ namespace atsocr
             int lineno = 0;
 			CurLoc = 0;
             lbPoint.Text = "" + CursorPoint.X + "," + CursorPoint.Y;
-#if false
+#if true
+            int boxcount = 0;  // interatorしかないので取得できないらしい
+            tbInfo.AppendText("Page:" + boxcount + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
+            using (var iter = page.GetIterator())
+            {
+                iter.Begin();
+
+				bool outok = capture_page;
+				string prevWord = "";
+				string prevWord2 = "";
+
+                bool cr = false;
+                bool curLocSet = false;
+
+                do
+                {
+                    string word = iter.GetText(PageIteratorLevel.Word);
+
+                    if (string.IsNullOrWhiteSpace(word))
+                        continue;
+
+                    Rect rc;
+                    if (iter.TryGetBoundingBox(PageIteratorLevel.Word, out rc))
+                    {
+                        int h = rc.Y2 - rc.Y2;
+                        int w = rc.X2 - rc.X1;
+                        // DBW($"{word} ({rc.X1},{rc.Y1})-({rc.X2},{rc.Y2})");
+
+                        //bool incursor;
+						//tbText.AppendText(word+ " (" + rc.X1 + "," + rc.Y1+ ")\r\n");
+                        if (CursorPoint.Y >= rc.Y1 && CursorPoint.Y <= rc.Y2+UnderGap){
+                            //incursor = true;
+							if (!outok)
+							{
+                                if (CursorPoint.X < rc.X1	// cursorを飛び越えた
+                                	|| (CursorPoint.X >= rc.X1 && CursorPoint.X <= rc.X2)	// cursorが矩形内
+                                	){
+                                    outok = true;
+                                    DBW($"{word} ({rc.X1},{rc.Y1})-({rc.X2},{rc.Y2})");
+									curLocSet = true;
+	                                if (prevWord.Length != 0) {
+										if (NumPrevWords >= 2 && prevWord2.Length != 0){
+											tbText.AppendText(prevWord2 + " " + prevWord + " ");
+                                            CurLoc = prevWord2.Length + 1 + prevWord.Length + 1;
+										} else {
+		                                    tbText.AppendText(prevWord + " ");
+                                            CurLoc = prevWord.Length + 1;
+                                        }
+	                                }
+                                } else {
+									prevWord2 = prevWord;
+									prevWord = word;
+								}
+							}
+                        } else {
+                            //incursor = false;
+                        }
+
+                        if (outok){
+                            tbInfo.AppendText(word+ " (" + w + "x" + h + ":" + rc.X1 + "," + rc.Y1 + ")\r\n");
+                        }
+
+                        if (last_x > rc.X1){
+                            if (tbText.Text!="")
+                                cr = true;
+                            lineno++;
+                        }
+                        last_x = rc.X1;
+
+                        if (outok){
+                            if (cr){
+                                tbText.AppendText("\r\n");
+                                if (curLocSet)
+                                    CurLoc += 2;	// CR+LF
+                            }
+
+                            tbText.AppendText(word + " ");
+                        }
+                    }
+
+                } while (iter.Next(PageIteratorLevel.Word));
+            }
+#else
             tbInfo.AppendText("Page:" + md.Images.Count + " pt:" + CursorPoint.X + "," + CursorPoint.Y + "\r\n");
             for (int i = 0; i < md.Images.Count; i++)
             {
