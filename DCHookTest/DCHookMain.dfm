@@ -2596,6 +2596,7 @@ object DCHookMainForm: TDCHookMainForm
       end
       object miConfig: TMenuItem
         Caption = '&Config'
+        ShortCut = 16455
         OnClick = miConfigClick
       end
       object N6: TMenuItem
@@ -2614,6 +2615,7 @@ object DCHookMainForm: TDCHookMainForm
       end
       object miExit: TMenuItem
         Caption = 'E&xit'
+        ShortCut = 16465
         OnClick = miExitClick
       end
     end
@@ -2623,7 +2625,7 @@ object DCHookMainForm: TDCHookMainForm
     AutoPopup = False
     OnPopup = pmTrayIconPopup
     Left = 144
-    Top = 88
+    Top = 96
     object miInstallMODI: TMenuItem
       Caption = 'MODIのインストール....'
       Visible = False
