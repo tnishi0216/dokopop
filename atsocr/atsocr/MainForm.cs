@@ -157,7 +157,6 @@ namespace atsocr
 				string prevWord2 = "";
 
                 bool cr = false;
-                bool curLocSet = false;
 
                 do
                 {
@@ -169,6 +168,7 @@ namespace atsocr
                     Rect rc;
                     if (iter.TryGetBoundingBox(PageIteratorLevel.Word, out rc))
                     {
+                        bool curLocSet = false;
                         int h = rc.Y2 - rc.Y2;
                         int w = rc.X2 - rc.X1;
                         // DBW($"{word} ({rc.X1},{rc.Y1})-({rc.X2},{rc.Y2})");
@@ -179,9 +179,7 @@ namespace atsocr
                             //incursor = true;
 							if (!outok)
 							{
-                                if (CursorPoint.X < rc.X1	// cursorを飛び越えた
-                                	|| (CursorPoint.X >= rc.X1 && CursorPoint.X <= rc.X2)	// cursorが矩形内
-                                	){
+                                if (CursorPoint.X <= rc.X2){	// cursorが矩形内 or cursorを飛び越えた
                                     outok = true;
                                     DBW($"{word} ({rc.X1},{rc.Y1})-({rc.X2},{rc.Y2})");
 									curLocSet = true;
