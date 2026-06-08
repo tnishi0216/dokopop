@@ -7,6 +7,7 @@ struct TDCHConfig {
 	int MoveSend : 1;
 	int OnlyImage : 1;
 	int UseNumPrev : 1;
+	int OnlyAlnum : 1;
 	int ScaleX;
 	int ScaleY;
 	char reserved[_MAX_PATH];	// AMODIPATH

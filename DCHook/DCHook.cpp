@@ -403,6 +403,7 @@ int ScaleX = 0;	// 96‚ð1‚Æ‚µ‚½‰æ–Ê‚ÌŠg‘å—¦
 int ScaleY = 0;
 int generation = 0;
 int NumPrevWords = 1;	// ‰½ŒÂ‚Ü‚Å‘O‚Ì’PŒê‚ðE‚¤‚©H
+bool OnlyAlnum = true;
 
 TCHAR ImageTextPath[256+40];	// OCR—pimage filename or text filename
 DWORD SaveImageTime;
@@ -874,7 +875,7 @@ int WINAPI Config( int clickonly, int keyaction, int keyflag )
 __declspec(dllexport)
 int WINAPI Config2( const struct TDCHConfig *cfg )
 {
-	DBW("Config2: %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseATSOCR, cfg->UseNumPrev ? cfg->NumPrevWords : 1);
+	DBW("Config2: %d %d %d %d %d", (int)cfg->ScaleX, (int)cfg->ScaleY, (int)cfg->UseATSOCR, cfg->UseNumPrev ? cfg->NumPrevWords : 1, cfg->OnlyAlnum);
 
 	MoveSend = cfg->MoveSend ? true : false;
 	MoveSent = false;
@@ -882,6 +883,7 @@ int WINAPI Config2( const struct TDCHConfig *cfg )
 	ScaleX = cfg->ScaleX;
 	ScaleY = cfg->ScaleY;
 	NumPrevWords = cfg->UseNumPrev ? cfg->NumPrevWords : 1;
+	OnlyAlnum = (cfg->OnlyAlnum ? true : false);
 
 	RequireHwndATSOCR = false;
 
@@ -2701,8 +2703,8 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 			// send image to ATSOCR
 			SYSTEMTIME t;
 			GetLocalTime(&t);
-			wsprintf(path+len, /*path_size-len,*/ _T("\\atsocr\\%04d-%02d-%02d-%02d%02d%02d-n%d.bmp"),
-				t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, NumPrevWords );
+			wsprintf(path+len, /*path_size-len,*/ _T("\\atsocr\\%04d-%02d-%02d-%02d%02d%02d-n%d-a%d.bmp"),
+				t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond, NumPrevWords, OnlyAlnum );
 			atsocr.Send(WMCD_SETPOINT, (char*)&ptCursor, sizeof(ptCursor));
 			HANDLE fh = CreateFile(path,  GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 			if (fh!=INVALID_HANDLE_VALUE){

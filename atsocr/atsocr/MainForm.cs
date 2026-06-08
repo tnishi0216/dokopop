@@ -120,7 +120,8 @@ namespace atsocr
             Tesseract.Page page = null;
             for (int i = 0; i < 10; i++){
                 try {
-                    engine = new TesseractEngine(TESSDATA_DIR, "eng");
+                    string language = OnlyAlbum ? "eng" : "eng+jpn";
+                    engine = new TesseractEngine(TESSDATA_DIR, language);
                     using (var pix = Pix.LoadFromFile(filename))
                     {
                         DBW("DoOCR:OCR");
@@ -244,6 +245,12 @@ namespace atsocr
 			{
 				NumPrevWords = int.Parse(m.Groups["n"].Value);
 			}
+			r = new Regex(@"-a(?<a>\d+)");
+			m = r.Match(filename);
+			if (m.Success)
+			{
+                OnlyAlbum = (int.Parse(m.Groups["a"].Value) != 0);
+			}
 		}
 
         //イベントハンドラ
@@ -329,6 +336,7 @@ namespace atsocr
             return p;
         }
         int NumPrevWords = 1;
+        bool OnlyAlbum = true;
         // interface for external app
         protected override void WndProc(ref Message m)
         {

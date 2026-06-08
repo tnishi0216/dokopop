@@ -35,6 +35,7 @@
 
 #define	DPI_DETECT			0		// DPI Detect in main (monitor‚²‚Æ‚ÌÝ’è‚ª‚Å‚«‚È‚¢‚½‚ßdebug—p)
 
+#define	DEF_IGNOREJ			(true)
 #define	DEF_CAPTURE_MODE	CM_IMAGE
 #define	DEF_USE64			(fWow64)
 
@@ -114,7 +115,7 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	GroupOpen = Ini->ReadInteger( PFS_CONFIG, PFS_GROUPOPEN, false );
 	GroupName = Ini->ReadString( PFS_CONFIG, PFS_GROUPNAME, "" );
 	CtrlClose = Ini->ReadInteger( PFS_CONFIG, PFS_CTRLCLOSE, false );
-	IgnoreJ   = Ini->ReadInteger( PFS_CONFIG, PFS_IGNOREJ, true );
+	IgnoreJ   = Ini->ReadInteger( PFS_CONFIG, PFS_IGNOREJ, DEF_IGNOREJ );
 	Banner    = Ini->ReadInteger( PFS_CONFIG, PFS_BANNER, true );
 	EnableAdvanced = Ini->ReadInteger( PFS_CONFIG, PFS_ADVANCED, false );
 
@@ -1332,6 +1333,7 @@ void TDCHookMainForm::SetupConfig2()
 	}
 	cfg.ScaleY = cfg.ScaleX;
 	cfg.UseNumPrev = 1;
+	cfg.OnlyAlnum = IgnoreJ;
 	cfg.NumPrevWords = 2;
 	hDll->Config2(&cfg);
 }
