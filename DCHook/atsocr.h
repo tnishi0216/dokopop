@@ -13,10 +13,10 @@ class ATSOCR {
 protected:
 	HWND hwndATSOCR;
 public:
-	ATSOCR(){ hwndATSOCR = nullptr; }
+	ATSOCR(){ hwndATSOCR = NULL; }
 	HWND GetHandle() const { return hwndATSOCR; }
 	bool IsWindowEnabled() const { return ::IsWindowEnabled(hwndATSOCR) == TRUE; }
-	void ResetHandle() { hwndATSOCR = nullptr; }
+	void ResetHandle() { hwndATSOCR = NULL; }
 	HWND Find(bool force=false);
 	int Send(int cmd, const char *data, int len);
 	void CheckAlive();
