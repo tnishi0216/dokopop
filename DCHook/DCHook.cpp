@@ -101,7 +101,7 @@
 #endif
 void dbw(const char *format, ...);
 
-#define	tsizeof(type)	sizeof(type)
+#define	tsizeof(type)	(sizeof(type)/sizeof(TCHAR))
 #define	int_bool(v)		((v)!=0)
 
 #pragma warning (disable : 4996)
@@ -2695,9 +2695,9 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 		ok = false;
 
 		TCHAR *path = ImageTextPath;
-		size_t path_size = sizeof(ImageTextPath);
+		size_t path_size = tsizeof(ImageTextPath);
 		size_t len;
-		memset(path, 0, path_size);
+		memset(path, 0, sizeof(ImageTextPath));
 		len = GetTempPath((DWORD)path_size, path);
 		if (len>0){
 			// send image to ATSOCR
