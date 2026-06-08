@@ -89,7 +89,7 @@ __fastcall TDCHookMainForm::TDCHookMainForm(TComponent* Owner)
 	Capturing = false;
 	PopupText = NULL;
 	DoPopupRetry = 0;
-	CaptureMode = CM_TEXT | CM_IMAGE;
+	CaptureMode = CM_IMAGE;
 	ATSOCRAvail = false;
 	MouseIncSrch = false;
 }
