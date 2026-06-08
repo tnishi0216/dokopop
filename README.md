@@ -11,4 +11,7 @@
 # 今後の予定
 
 - 使用するOCRエンジンの変更
-  - MODI(Microsoft Office Document Imaging)のサポートが終了したらしく、Windows OCRへの対応を検討中
+  - MODI(Microsoft Office Document Imaging)のサポートが終了したらしく、別のOCRへの対応を検討中
+    - Windows.Media.Ocr (MicrosoftOCR)は認識率が悪いので諦め（Snipping Toolのものとは違うらしい）
+    - Tesseractに対応予定
+

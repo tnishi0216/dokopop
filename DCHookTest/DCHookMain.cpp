@@ -173,7 +173,7 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	InitATSOCR();
 	btnOK->Left = (SavedWidth - btnOK->Width)>>1;
 	btnOK->Top = Height - btnOK->Height - 8;
-	lbVersion->Caption = StrVersion;
+	lbVersion->Caption = GetStrVersion();
 	lbVersion->Left = btnOK->Left + btnOK->Width + 4;
 	lbVersion->Top = btnOK->Top;
 	
@@ -700,8 +700,7 @@ void TDCHookMainForm::EvCopyData(TMessage& msg )
 		case DCH_HITTEXT1:	// single char
 		{
 			DBW("DCH_HITTEXT1");
-			if (PopupText)
-				delete[] PopupText;
+			delete[] PopupText;
 #ifdef USE_UNICODE
 			// ANSI -> Unicode
 			//*+++ 動作未確認 2002.12.4
@@ -783,8 +782,7 @@ void TDCHookMainForm::EvCopyData(TMessage& msg )
 					edFound->Text = text + loc;
 				}
 			}
-			if ( buf )
-				delete[] buf;
+			delete[] buf;
 		}
 			break;
 #endif
@@ -1217,8 +1215,7 @@ void TDCHookMainForm::EvPopup(TMessage &msg)
 		delete[] text;
 	} else {
 		// retry again
-		if (PopupText)
-			delete[] PopupText;	// あとに来たほうを優先する
+		delete[] PopupText;	// あとに来たほうを優先する
 		PopupText = text;
 		PopupLoc = loc;
 		PopupMoveSend = movesend;
@@ -1388,7 +1385,7 @@ void TDCHookMainForm::EvShortcut( TMessage &msg )
 }
 void TDCHookMainForm::EvGetVersion( TMessage &msg )
 {
-	msg.Result = VersionValue;
+	msg.Result = GetVersionValue();
 }
 //---------------------------------------------------------------------------
 // 右クリック検索ON/OFF表示

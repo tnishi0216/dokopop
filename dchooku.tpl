@@ -105,10 +105,10 @@
 　別途PDIC/Unicodeを入手して下さい。
 
 　PDIC/Unicode の入手先(必須)：
-  http://pdic.la.coocan.jp/
+  https://pdic.sakura.ne.jp/unicode/
 
 　ソースファイル：
-  http://dokopop.sourceforge.jp/
+  https://github.com/tnishi0216/dokopop
 ##EOF
 
 ##<DKPUu.TXT
@@ -162,7 +162,7 @@
 　スタートアップに登録した方が便利です。(Windows起動時にDokoPop!も起動)
 
 　どこポップ！にはPDIC/Unicode Ver.5.7.21以降 が必要です。
-  http://pdic.la.coocan.jp/
+  https://pdic.sakura.ne.jp/unicode/
   からダウンロードして下さい。
 
 使用方法 -----------------------------------------------------
@@ -267,7 +267,7 @@
 　各言語の文法を勉強し、組み込む必要があります。
 
 　このための開発情報をこちらで公開しています。
-　http://pdic.la.coocan.jp/unicode/langproc.html
+　http://pdic.sakura.ne.jp/unicode/langproc.html
 
 その他 -------------------------------------------------------
 
@@ -276,11 +276,11 @@
 
 　このprogramは、open sourceであるDCHookのsample programです。
 　ソースファイルは、
-　http://dokopop.sourceforge.jp/
+　https://github.com/tnishi0216/dokopop
 　にあります。
 
 　PDIC/Unicodeは
-　http://pdic.la.coocan.jp/unicode/
+　http://pdic.sakura.ne.jp/unicode/
 
 履歴 ---------------------------------------------------------
 

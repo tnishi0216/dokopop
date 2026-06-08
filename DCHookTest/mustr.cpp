@@ -26,7 +26,7 @@ void __mustr::constructor(const wchar_t *str, int len)
 }
 __mustr::~__mustr()
 {
-	if ( newbuffer ) delete[] newbuffer;
+	delete[] newbuffer;
 }
 __mustr::operator char *()
 {
