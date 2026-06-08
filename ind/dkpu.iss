@@ -27,10 +27,12 @@ Source: "atsocr.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "atsocr.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "atsocr.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Tesseract.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "x86\leptonica-1.82.0.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "x86\tesseract50.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "x64\leptonica-1.82.0.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "x64\tesseract50.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "x86\leptonica-1.82.0.dll"; DestDir: "{app}\x86"; Flags: ignoreversion
+Source: "x86\tesseract50.dll"; DestDir: "{app}\x86"; Flags: ignoreversion
+Source: "x64\leptonica-1.82.0.dll"; DestDir: "{app}\x64"; Flags: ignoreversion
+Source: "x64\tesseract50.dll"; DestDir: "{app}\x64"; Flags: ignoreversion
+Source: "tessdata\eng.traineddata"; DestDir: "{app}\tessdata"; Flags: ignoreversion
+Source: "tessdata\jpn.traineddata"; DestDir: "{app}\tessdata"; Flags: ignoreversion
 Source: "DKPu.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

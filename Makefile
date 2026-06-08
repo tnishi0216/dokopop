@@ -6,6 +6,9 @@ all:
 
 prep:
 	-mkdir DCHookTest\obj
+	-mkdir ind\x86
+	-mkdir ind\x64
+	-mkdir ind\tessdata
 
 copy_release:
 	copy DCHook\Release\DCHook.dll DCHookTest\DKPUHK.DLL
@@ -14,8 +17,6 @@ copy_release:
 #	copy DCHook64\dchk64\x64\Release\dchk64.exe DCHooktest\DKPUHK64.exe
 
 copy_bin:
-	echo DKPUHK.DLL(DCHOOK.DLL)ÇÕVS2008Ç≈çÏê¨ÇµÇΩÇ©ÅH
-	pause
 #	$(CPI) DCHook\Win32\Release\DCHook.dll ind\DKPUHK.dll
 #	$(CPI) DCHook\x64\Release\DCHook.dll ind\DKPUHK64.dll
 #	$(CPI) bin\DKPUHK.DLL ind\DKPUHK.dll
@@ -30,6 +31,8 @@ copy_bin:
 	$(CPI) DCHookTest\x86\tesseract50.dll ind\x86\tesseract50.dll
 	$(CPI) DCHookTest\x64\leptonica-1.82.0.dll ind\x64\leptonica-1.82.0.dll
 	$(CPI) DCHookTest\x64\tesseract50.dll ind\x64\tesseract50.dll
+	$(CPI) DCHookTest\tessdata\eng.traineddata ind\tessdata\eng.traineddata
+	$(CPI) DCHookTest\tessdata\jpn.traineddata ind\tessdata\jpn.traineddata
 	$(CPI) DCHookTest\DCHookTest.exe ind\DKPu.exe
 	$(CPI) DKPU.TXT ind\DKPu.txt
 
