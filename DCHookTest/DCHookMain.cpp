@@ -769,8 +769,7 @@ void TDCHookMainForm::EvCopyData(TMessage& msg )
 		case DCH_HITTEXT1:	// single char
 		{
 			DBW("DCH_HITTEXT1");
-			if (PopupText)
-				delete[] PopupText;
+			delete[] PopupText;
 #ifdef USE_UNICODE
 			// ANSI -> Unicode
 			//*+++ “®ì–¢Šm”F 2002.12.4
@@ -853,8 +852,7 @@ void TDCHookMainForm::EvCopyData(TMessage& msg )
 					edFound->Text = text + loc;
 				}
 			}
-			if ( buf )
-				delete[] buf;
+			delete[] buf;
 		}
 			break;
 #endif
@@ -1287,8 +1285,7 @@ void TDCHookMainForm::EvPopup(TMessage &msg)
 		delete[] text;
 	} else {
 		// retry again
-		if (PopupText)
-			delete[] PopupText;	// ‚ ‚Æ‚É—ˆ‚½‚Ù‚¤‚ğ—Dæ‚·‚é
+		delete[] PopupText;	// ‚ ‚Æ‚É—ˆ‚½‚Ù‚¤‚ğ—Dæ‚·‚é
 		PopupText = text;
 		PopupLoc = loc;
 		PopupMoveSend = movesend;

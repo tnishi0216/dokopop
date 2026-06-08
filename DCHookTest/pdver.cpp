@@ -27,8 +27,7 @@ ProjectRCVersion::ProjectRCVersion(const TCHAR *appFName)
 
 ProjectRCVersion::~ProjectRCVersion()
 {
-	if (FVData)
-		delete[] FVData;
+	delete[] FVData;
 }
 
 bool ProjectRCVersion::GetProductVersion(AnsiString &prodVersion)
@@ -82,7 +81,7 @@ ProjectRCVersionString::ProjectRCVersionString(const TCHAR *appFName)
 		_tcscpy(subBlockName, VERS_TRANSLATION);
 		if (!VerQueryValue(FVData, subBlockName, (void **)&TransBlock, &vSize)) {
 			delete[] FVData;
-			FVData = 0;
+			FVData = NULL;
 		} else {
 			// 上下ワードをスワップして，wsprintf が lang-charset を正しい書式で出力するようにする
 			*(DWORD *)TransBlock = MAKELONG(HIWORD(*(DWORD *)TransBlock), LOWORD(*(DWORD *)TransBlock));

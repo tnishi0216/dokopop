@@ -258,8 +258,8 @@ int GetMonitorScale()
 		break;
 	}
 
-	if (dpis) delete[] dpis;
-	if (pModeInfoArray) delete[] pModeInfoArray;
+	delete[] dpis;
+	delete[] pModeInfoArray;
 
 	if (ok)
 		return dpi * PhysicalDesktopWidth / PhysicalMonitorWidth;
