@@ -11,8 +11,9 @@
 
 class ATSOCR {
 protected:
-	HWND hwndATSOCR = nullptr;
-public:	
+	HWND hwndATSOCR;
+public:
+	ATSOCR(){ hwndATSOCR = nullptr; }
 	HWND GetHandle() const { return hwndATSOCR; }
 	bool IsWindowEnabled() const { return ::IsWindowEnabled(hwndATSOCR) == TRUE; }
 	void ResetHandle() { hwndATSOCR = nullptr; }
