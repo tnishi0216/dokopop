@@ -119,9 +119,12 @@ private:	// ユーザー宣言
 	bool CtrlClose;
 	bool IgnoreJ;
 	bool Banner;
-	int CaptureMode;	// 0:conventional 1:use ATSOCR
+	bool EnableAdvanced;
+	int CaptureMode;	// CM_IMAGE or CM_TEXT
 	bool ATSOCRAvail;	// ATSOCR available or not
 	bool MouseIncSrch;
+	int GetActualCaptureMode() const;
+	bool IsActualUse64() const;
 public:		// ユーザー宣言
 	__fastcall TDCHookMainForm(TComponent* Owner);
 	void EvCopyData(TMessage&);

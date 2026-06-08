@@ -47,6 +47,8 @@ __published:	// IDE 管理のコンポーネント
 	TComboBox *cbCaptureMode;
 	TCheckBox *cbUse64;
 	TCheckBox *cbDPISetting;
+	TGroupBox *grpAdvanced;
+	TCheckBox *cbAdvanced;
 	void __fastcall cbGroupOpenClick(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
 	void __fastcall FormCloseQuery(TObject *Sender, bool &CanClose);
@@ -56,6 +58,7 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall miShowATSOCRClick(TObject *Sender);
 	void __fastcall cbCaptureModeChange(TObject *Sender);
 	void __fastcall cbDPISettingClick(TObject *Sender);
+	void __fastcall cbAdvancedClick(TObject *Sender);
 private:	// ユーザー宣言
 public:		// ユーザー宣言
 	__fastcall TPopupConfigDlg(TComponent* Owner);

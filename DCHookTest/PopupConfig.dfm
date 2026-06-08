@@ -90,6 +90,46 @@ object PopupConfigDlg: TPopupConfigDlg
     Caption = '     '
     OnDblClick = lbDebugDblClick
   end
+  object grpAdvanced: TGroupBox
+    Left = 16
+    Top = 278
+    Width = 257
+    Height = 81
+    TabOrder = 9
+    object cbCaptureMode: TComboBox
+      Left = 24
+      Top = 24
+      Width = 193
+      Height = 20
+      Style = csDropDownList
+      ItemHeight = 12
+      TabOrder = 0
+      OnChange = cbCaptureModeChange
+      Items.Strings = (
+        '文字認識＋文字抽出'
+        '文字認識のみ'
+        '文字抽出のみ')
+    end
+    object cbUse64: TCheckBox
+      Left = 24
+      Top = 51
+      Width = 193
+      Height = 17
+      Caption = '&64ビットフックを使用する'
+      TabOrder = 1
+      Visible = False
+    end
+    object cbDPISetting: TCheckBox
+      Left = 24
+      Top = 70
+      Width = 193
+      Height = 17
+      Caption = '解像度設定をする(&D)'
+      TabOrder = 2
+      Visible = False
+      OnClick = cbDPISettingClick
+    end
+  end
   object cbGroupOpen: TCheckBox
     Left = 24
     Top = 32
@@ -101,7 +141,7 @@ object PopupConfigDlg: TPopupConfigDlg
   end
   object cbCtrlClose: TCheckBox
     Left = 24
-    Top = 224
+    Top = 218
     Width = 233
     Height = 17
     Caption = 'Ctrlキーを離したらﾎﾟｯﾌﾟｱｯﾌﾟを閉じる(&C)'
@@ -116,7 +156,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 12
+    TabOrder = 11
   end
   object btnCancel: TButton
     Left = 112
@@ -126,7 +166,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
-    TabOrder = 13
+    TabOrder = 12
   end
   object edGroupName: TComboBox
     Left = 136
@@ -217,7 +257,7 @@ object PopupConfigDlg: TPopupConfigDlg
   end
   object cbIgnoreJ: TCheckBox
     Left = 24
-    Top = 248
+    Top = 244
     Width = 225
     Height = 17
     Caption = '英数字のみ検索する(&J)'
@@ -236,7 +276,7 @@ object PopupConfigDlg: TPopupConfigDlg
     Position = 0
     SelEnd = 0
     SelStart = 0
-    TabOrder = 11
+    TabOrder = 10
     ThumbLength = 8
     TickMarks = tmBottomRight
     TickStyle = tsAuto
@@ -248,41 +288,17 @@ object PopupConfigDlg: TPopupConfigDlg
     Width = 75
     Height = 25
     Caption = '&Help'
-    TabOrder = 14
+    TabOrder = 13
     OnClick = btnHelpClick
   end
-  object cbCaptureMode: TComboBox
+  object cbAdvanced: TCheckBox
     Left = 24
-    Top = 276
-    Width = 193
-    Height = 20
-    Style = csDropDownList
-    ItemHeight = 12
+    Top = 275
+    Width = 97
+    Height = 17
+    Caption = '詳細設定(&A)'
     TabOrder = 8
-    OnChange = cbCaptureModeChange
-    Items.Strings = (
-      '文字認識＋文字抽出'
-      '文字認識のみ'
-      '文字抽出のみ')
-  end
-  object cbUse64: TCheckBox
-    Left = 24
-    Top = 344
-    Width = 193
-    Height = 17
-    Caption = '&64ビットフックを使用する'
-    TabOrder = 9
-    Visible = False
-  end
-  object cbDPISetting: TCheckBox
-    Left = 24
-    Top = 362
-    Width = 193
-    Height = 17
-    Caption = '解像度設定をする(&D)'
-    TabOrder = 10
-    Visible = False
-    OnClick = cbDPISettingClick
+    OnClick = cbAdvancedClick
   end
   object ActionList1: TActionList
     Left = 272

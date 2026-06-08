@@ -50,6 +50,8 @@ void __fastcall TPopupConfigDlg::FormShow(TObject *Sender)
 #endif
 	if (fWow64)
 		cbUse64->Visible = true;
+
+	cbAdvancedClick(this);
 }
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::FormCloseQuery(TObject *Sender,
@@ -65,6 +67,14 @@ void __fastcall TPopupConfigDlg::FormCloseQuery(TObject *Sender,
 			return;
 		}
 	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TPopupConfigDlg::cbAdvancedClick(TObject *Sender)
+{
+	bool enabled = cbAdvanced->Checked;
+	grpAdvanced->Enabled = enabled;
+	cbCaptureMode->Enabled = enabled;
+	cbUse64->Enabled = enabled;
 }
 //---------------------------------------------------------------------------
 void __fastcall TPopupConfigDlg::cbCaptureModeChange(TObject *Sender)

@@ -25,6 +25,7 @@ DEF_PFS(IGNOREJ, "IgnoreJ");
 DEF_PFS(PATH, "Path");
 DEF_PFS(BANNER, "Banner");
 DEF_PFS(INCSRCH, "IncSrch");
+DEF_PFS(ADVANCED, "Advanced");
 DEF_PFS(CAPTURE_MODE, "CaptureMode2");
 DEF_PFS(DPI_DETECT, "DPIDetect");
 DEF_PFS(SCALE, "Scale");

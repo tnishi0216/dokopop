@@ -35,6 +35,7 @@
 
 #define	DPI_DETECT			0		// DPI Detect in main (monitor‚²‚Æ‚ÌÝ’è‚ª‚Å‚«‚È‚¢‚½‚ßdebug—p)
 
+#define	DEF_CAPTURE_MODE	CM_IMAGE
 #define	DEF_USE64			(fWow64)
 
 /*------------------------------------------*/
@@ -89,11 +90,15 @@ __fastcall TDCHookMainForm::TDCHookMainForm(TComponent* Owner)
 	Capturing = false;
 	PopupText = NULL;
 	DoPopupRetry = 0;
-	CaptureMode = CM_IMAGE;
+	CaptureMode = DEF_CAPTURE_MODE;
 	ATSOCRAvail = false;
 	MouseIncSrch = false;
 }
 //---------------------------------------------------------------------------
+int TDCHookMainForm::GetActualCaptureMode() const
+	{ return EnableAdvanced ? CaptureMode : DEF_CAPTURE_MODE; }
+bool TDCHookMainForm::IsActualUse64() const
+	{ return EnableAdvanced ? Ini->ReadInteger(PFS_CONFIG, PFS_USE64, DEF_USE64) : DEF_USE64; }
 void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 {
 	Ini = new TMyIni( HKEY_CURRENT_USER, COMPANYNAME APPREGNAME, true );
@@ -111,6 +116,7 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	CtrlClose = Ini->ReadInteger( PFS_CONFIG, PFS_CTRLCLOSE, false );
 	IgnoreJ   = Ini->ReadInteger( PFS_CONFIG, PFS_IGNOREJ, true );
 	Banner    = Ini->ReadInteger( PFS_CONFIG, PFS_BANNER, true );
+	EnableAdvanced = Ini->ReadInteger( PFS_CONFIG, PFS_ADVANCED, false );
 
 #ifndef _DEBUG
 	BorderStyle = bsNone;
@@ -288,8 +294,10 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 	PopupConfigDlg->cbCtrlClose->Checked = CtrlClose;
 	PopupConfigDlg->cbIgnoreJ->Checked = IgnoreJ;
 	PopupConfigDlg->cbBanner->Checked = Banner;
+	PopupConfigDlg->cbAdvanced->Checked = EnableAdvanced;
 	PopupConfigDlg->SetCaptureMode( CaptureMode );
 	PopupConfigDlg->SetScaler( Ini->ReadInteger(PFS_CONFIG, PFS_SCALE, 0) );
+	bool act_use64 = IsActualUse64();
 	bool use64 = Ini->ReadInteger(PFS_CONFIG, PFS_USE64, DEF_USE64);
 	PopupConfigDlg->cbUse64->Checked = use64;
 	SetForegroundWindow( PopupConfigDlg->Handle );
@@ -303,14 +311,16 @@ void __fastcall TDCHookMainForm::miOptionClick(TObject *Sender)
 			PopupConfigDlg->GetPopupKey() );
 		Ini->WriteInteger( PFS_CONFIG, PFS_TOGGLEKEY,
 			PopupConfigDlg->GetToggleKey() );
+		EnableAdvanced = PopupConfigDlg->cbAdvanced->Checked;
 		CaptureMode = PopupConfigDlg->GetCaptureMode();
+		Ini->WriteInteger( PFS_CONFIG, PFS_ADVANCED, EnableAdvanced );
 		Ini->WriteInteger( PFS_CONFIG, PFS_CAPTURE_MODE, CaptureMode );
 		Ini->WriteInteger( PFS_CONFIG, PFS_SCALE, PopupConfigDlg->GetScaler() );
 		Ini->WriteInteger(PFS_CONFIG, PFS_USE64, PopupConfigDlg->cbUse64->Checked);
 		SaveConfig();
 		SetupConfig();
 		tmReInit->Enabled = false;
-		if (PopupConfigDlg->cbUse64->Checked != use64){
+		if (act_use64 != IsActualUse64()){
 			// 64bit hook •ÏXŽž
 			Unhook();
 			Hook();
@@ -443,7 +453,7 @@ void __fastcall TDCHookMainForm::pmTrayIconPopup(TObject *Sender)
 	miIncSearch->Checked = MouseIncSrch;
 	miEnablePopup->Checked = EnablePopup;
 
-	miOCRText->Visible = CaptureMode & CM_IMAGE ? true : false;
+	miOCRText->Visible = GetActualCaptureMode() & CM_IMAGE ? true : false;
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::btnOKClick(TObject *Sender)
@@ -1272,6 +1282,7 @@ void TDCHookMainForm::SaveConfig()
 	Ini->WriteInteger( PFS_CONFIG, PFS_CTRLCLOSE, CtrlClose );
 	Ini->WriteInteger( PFS_CONFIG, PFS_IGNOREJ, IgnoreJ );
 	Ini->WriteInteger( PFS_CONFIG, PFS_BANNER, Banner );
+	Ini->WriteInteger( PFS_CONFIG, PFS_ADVANCED, EnableAdvanced );
 }
 void TDCHookMainForm::OpenDicGroup( const char *name )
 {
@@ -1306,8 +1317,8 @@ void TDCHookMainForm::SetupConfig2()
 
 	TDCHConfig cfg;
 	memset(&cfg, 0, sizeof(cfg));
-	cfg.UseATSOCR = ATSOCRAvail && (CaptureMode & CM_IMAGE);
-	cfg.OnlyATSOCR = ATSOCRAvail && !(CaptureMode & CM_TEXT);
+	cfg.UseATSOCR = ATSOCRAvail && (GetActualCaptureMode() & CM_IMAGE);
+	cfg.OnlyATSOCR = ATSOCRAvail && !(GetActualCaptureMode() & CM_TEXT);
 	cfg.MoveSend = MouseIncSrch;
 	//cfg.OnlyImage = 1;	//TODO:
 
