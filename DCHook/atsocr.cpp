@@ -4,7 +4,7 @@
 #pragma hdrstop
 #include "atsocr.h"
 
-#define	tsizeof(type)	sizeof(type)
+#define	tsizeof(type)	(sizeof(type)/sizeof(TCHAR))
 
 #define	APPNAME	_T("Auto TSOCR")
 
