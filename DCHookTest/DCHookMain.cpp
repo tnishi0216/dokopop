@@ -185,6 +185,10 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	lbVersion->Top = btnOK->Top;
 	
 	BootTimer->Enabled = true;
+
+	if (!ATSOCRAvail && (GetActualCaptureMode() & CM_IMAGE)){
+		tmDNFNotify->Enabled = true;
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
@@ -524,6 +528,27 @@ void __fastcall TDCHookMainForm::tmMouseMoveTimer(TObject *Sender)
 		return;
 	//hDll->Capture();
 	hDll->CaptureAsync();
+}
+//---------------------------------------------------------------------------
+void __fastcall TDCHookMainForm::tmDNFInstallCheckTimer(TObject *Sender)
+{
+	if (ATSOCRRunable()){
+		// 最初のpopupで落ちてしまう？
+		if (!ATSOCRAvail && (GetActualCaptureMode() & CM_IMAGE)){
+			InitATSOCR();
+		}
+		if (ATSOCRAvail){
+			SetupConfig2();
+		}
+	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TDCHookMainForm::tmDNFNotifyTimer(TObject *Sender)
+{
+	tmDNFNotify->Enabled = false;
+	if (!ATSOCRRunable()){
+		NotifyDNF();
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::tmReInitTimer(TObject *Sender)
@@ -1352,6 +1377,9 @@ void TDCHookMainForm::SetupATSOCR()
 				tmReInit->Enabled = true;	// retry later
 		}
 	}
+	if (ATSOCRAvail){
+		tmDNFInstallCheck->Enabled = false;
+	}
 }
 void TDCHookMainForm::EnableClickOnly( bool enable )
 {
@@ -1420,6 +1448,13 @@ void TDCHookMainForm::ShowNotify()
 	SetWindowPos( NotifyForm->Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE );
 	tmNotify->Enabled = false;
 	tmNotify->Enabled = true;
+}
+void TDCHookMainForm::NotifyDNF()
+{
+	MessageBox(Handle, ".NET Framework 4.7.2以上が必要です", "DokoPop!エラー", MB_OK|MB_ICONEXCLAMATION);
+	if (ATSOCRRunable()){
+		tmDNFInstallCheck->Enabled = true;
+	}
 }
 void TDCHookMainForm::Reboot()
 {

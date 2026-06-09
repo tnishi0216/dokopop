@@ -483,7 +483,7 @@ bool MODIInstalled()
 }
 bool ATSOCRRunable()
 {
-	return true;
+	return GetDNFVersion()>=472;
 }
 bool LaunchATSOCR()
 {
@@ -682,7 +682,24 @@ unsigned GetDNFVersion()
 					DWORD dwByte = 4;
 					DWORD dwValue = 0;
 					if ( RegQueryValueEx( fullKey, "Release", NULL, &dwType, (BYTE*)&dwValue, &dwByte) == ERROR_SUCCESS){
-#if 0
+						if (dwValue >= 533509){
+							version = 481;
+						} else
+						if (dwValue >= 528040){
+							version = 480;
+						} else
+						if (dwValue >= 461808){
+							version = 472;
+						} else
+						if (dwValue >= 461308){
+							version = 471;
+						} else
+						if (dwValue >= 460798){
+							version = 470;
+						} else
+						if (dwValue >= 394802){
+							version = 462;
+						} else
 						if (dwValue >= 394254){
 							version = 461;
 						} else
@@ -692,7 +709,6 @@ unsigned GetDNFVersion()
 						if (dwValue >= 379893){
 							version = 452;
 						} else
-#endif
 						if (dwValue >= 378675){
 							version = 451;
 						} else

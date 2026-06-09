@@ -2626,10 +2626,6 @@ object DCHookMainForm: TDCHookMainForm
     OnPopup = pmTrayIconPopup
     Left = 144
     Top = 96
-    object miInstallMODI: TMenuItem
-      Caption = 'MODIのインストール....'
-      Visible = False
-    end
     object miGroup: TMenuItem
       Caption = '辞書グループ(&G)'
     end
@@ -2725,6 +2721,19 @@ object DCHookMainForm: TDCHookMainForm
     Interval = 100
     OnTimer = tmMouseMoveTimer
     Left = 144
+    Top = 273
+  end
+  object tmDNFInstallCheck: TTimer
+    Enabled = False
+    Interval = 3000
+    OnTimer = tmDNFInstallCheckTimer
+    Left = 192
+    Top = 276
+  end
+  object tmDNFNotify: TTimer
+    Enabled = False
+    OnTimer = tmDNFNotifyTimer
+    Left = 232
     Top = 273
   end
   object tmReInit: TTimer
