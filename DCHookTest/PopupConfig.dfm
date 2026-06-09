@@ -2,7 +2,7 @@ object PopupConfigDlg: TPopupConfigDlg
   Left = 414
   Top = 142
   BorderStyle = bsDialog
-  Caption = '‚Ç‚±ƒ|ƒbƒv‚Ìİ’è'
+  Caption = 'DokoPop!‚Ìİ’è'
   ClientHeight = 419
   ClientWidth = 306
   Color = clBtnFace
