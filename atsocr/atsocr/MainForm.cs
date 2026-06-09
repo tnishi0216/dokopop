@@ -374,7 +374,7 @@ namespace atsocr
                 } else
 				if (cds.dwData == (IntPtr)WMCD_SETPOINT){
 					CursorPoint = int2point(cds.lpData);
-					Console.WriteLine("Cursor:" + CursorPoint.X + "," + CursorPoint.Y);
+					DBW("Cursor:" + CursorPoint.X + "," + CursorPoint.Y);
 					return;
 				} else
 				if (cds.dwData == (IntPtr)WMCD_RESTORE_WINDOW)
