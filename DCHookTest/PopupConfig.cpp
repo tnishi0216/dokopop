@@ -30,15 +30,13 @@ void __fastcall TPopupConfigDlg::FormShow(TObject *Sender)
 
 	// Add groups to combo-box //
 	TAppIni ini;
-	if ( !ini.hroot ){
-		return;
-	}
+	if (ini.hroot){
+		ini.ReadValues( PFS_GROUP, edGroupName->Items );
 
-	ini.ReadValues( PFS_GROUP, edGroupName->Items );
-
-	if (!cbGroupOpen->Checked ){
-		int sel = ini.ReadInteger( PFS_COMMON, PFS_GRPSEL, -1 );
-		edGroupName->ItemIndex = sel;
+		if (!cbGroupOpen->Checked ){
+			int sel = ini.ReadInteger( PFS_COMMON, PFS_GRPSEL, -1 );
+			edGroupName->ItemIndex = sel;
+		}
 	}
 #else	// !USE_DDE
 	// WM_COPYDATAの場合は、辞書グループ指定はできない
@@ -73,6 +71,7 @@ void __fastcall TPopupConfigDlg::cbAdvancedClick(TObject *Sender)
 {
 	bool enabled = cbAdvanced->Checked;
 	grpAdvanced->Enabled = enabled;
+	grpAdvanced->Visible = enabled;
 	cbCaptureMode->Enabled = enabled;
 	cbUse64->Enabled = enabled;
 }
