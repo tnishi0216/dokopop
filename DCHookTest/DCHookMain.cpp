@@ -27,7 +27,7 @@
 //	ほか、popup/inc.srchをやるたびにDLL内の変数がresetされるためこれはよろしくない。
 #define	DETACHRELEASE		0
 
-#define	MIGROUP_INDEX		1		// 辞書グループ変更メニューのindex
+#define	MIGROUP_INDEX		0		// 辞書グループ変更メニューのindex
 
 // PDIC起動後のOpenLink()失敗時のretryおよびwaittime
 #define	OPEN_RETRY			5
