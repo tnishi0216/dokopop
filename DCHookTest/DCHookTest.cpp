@@ -68,21 +68,49 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 }
 //---------------------------------------------------------------------------
 
-typedef WINUSERAPI BOOL (WINAPI *FNSetProcessDpiAwarenessContext)(UINT_PTR vaule);
+typedef WINUSERAPI BOOL (WINAPI *FNSetProcessDpiAwarenessContext)(UINT_PTR vaule);	// for Windows10 or later
 #define	DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2	((UINT_PTR)-4)
+typedef enum {
+  PROCESS_DPI_UNAWARE = 0,
+  PROCESS_SYSTEM_DPI_AWARE = 1,
+  PROCESS_PER_MONITOR_DPI_AWARE = 2
+} PROCESS_DPI_AWARENESS;
+typedef WINUSERAPI HRESULT (WINAPI *FNSetProcessDpiAwareness)(PROCESS_DPI_AWARENESS vaule);
 void SetDpiAware()
 {
-	HINSTANCE hDll = LoadLibrary( _T("user32") );
+	HINSTANCE hDll = LoadLibrary( TEXT("user32") );
 	if (!hDll)
 		return;
+	bool ok = false;
+	// Windows10 or lter
 	FNSetProcessDpiAwarenessContext fnSetProcessDpiAwarenessContext = (FNSetProcessDpiAwarenessContext)GetProcAddress(hDll, "SetProcessDpiAwarenessContext");
 	if (fnSetProcessDpiAwarenessContext){
 		if (fnSetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)){
+			ok = true;
 		} else {
-			DBW("SetDpiAware failed: %d", GetLastError());
+			DBW("SetDpiAwareContext failed: %d", GetLastError());
 		}
+	} else {
+		DBW("No SetProcessDpiAwarenessContext");
 	}
 	FreeLibrary(hDll);
+	if (ok) return;
+
+	// Windows8.1
+	hDll = LoadLibrary(TEXT("shcore"));
+	if (hDll){
+		FNSetProcessDpiAwareness fnSetProcessDpiAwareness = (FNSetProcessDpiAwareness)GetProcAddress(hDll, "SetProcessDpiAwareness");
+		if (fnSetProcessDpiAwareness){
+			HRESULT hResult = fnSetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+			if (hResult == S_OK){
+			} else {
+				DBW("SetDpiAware failed: %d", GetLastError());
+			}
+		} else {
+			DBW("No SetProcessDpiAwareness");
+		}
+		FreeLibrary(hDll);
+	}
 }
 
 
