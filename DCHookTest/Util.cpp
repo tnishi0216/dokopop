@@ -736,9 +736,13 @@ static const char *clsname = "TDbgMsgForm";
 static const char *winname = "Debug Messenger";
 void dbw( const char *format, ... )
 {
+	if (hWin == (HWND)-1) return;
 	if ( !hWin ){
 		hWin = FindWindowA( clsname, winname );
-		if ( !hWin ) return;
+		if ( !hWin ){
+			hWin = (HWND)-1;
+			return;
+		}
 	}
 	va_list ap;
 	va_start( ap, format );
