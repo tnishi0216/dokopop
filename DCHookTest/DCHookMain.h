@@ -70,6 +70,7 @@ __published:	// IDE 管理のコンポーネント
 	TMenuItem *miCheckLatest;
 	TMenuItem *miOCRText;
 	TTimer *tmReInit;
+	TTimer *BootTimer0;
 	void __fastcall miHookClick(TObject *Sender);
 	void __fastcall miUnhookClick(TObject *Sender);
 	void __fastcall miExitClick(TObject *Sender);
@@ -106,6 +107,7 @@ __published:	// IDE 管理のコンポーネント
 	void __fastcall miCheckLatestClick(TObject *Sender);
 	void __fastcall miOCRTextClick(TObject *Sender);
 	void __fastcall tmReInitTimer(TObject *Sender);
+	void __fastcall BootTimer0Timer(TObject *Sender);
 private:	// ユーザー宣言
 	//void __fastcall IdleHandler(TObject *sender, bool &done);
 

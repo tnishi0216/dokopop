@@ -2742,4 +2742,10 @@ object DCHookMainForm: TDCHookMainForm
     Left = 280
     Top = 276
   end
+  object BootTimer0: TTimer
+    Interval = 10
+    OnTimer = BootTimer0Timer
+    Left = 104
+    Top = 136
+  end
 end
