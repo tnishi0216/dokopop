@@ -606,7 +606,7 @@ void TDCHookMainForm::Start()
 	BootTimer->Enabled = false;
 #ifndef _DEBUG
 	ShowWindow( Application->Handle, SW_HIDE );
-	Visible = false;
+	Visible = false;	// ‚±‚ê‚ðfalse‚É‚µ‚È‚¢‚ÆAlt+Tab‚Åmain window‚ªŒ©‚¦‚Ä‚µ‚Ü‚¤
 	Width = 0;
 #endif
 	if ( BootUp ){
