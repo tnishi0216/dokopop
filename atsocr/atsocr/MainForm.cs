@@ -192,6 +192,9 @@ namespace atsocr
 		                                    ocrText += prevWord + " ";
                                             CurLoc = prevWord.Length + 1;
                                         }
+                                        // 正確なclick位置を反映（文字は等幅と仮定）
+                                        // = (float)(CursorPoint.X - rc.X1) / (rc.X2 - rc.X1) * word.Length
+                                        if (word.Length>0 && CursorPoint.X >= rc.X1) CurLoc += (CursorPoint.X - rc.X1) * word.Length / (rc.X2 - rc.X1);
 	                                }
                                 } else {
 									prevWord2 = prevWord;
