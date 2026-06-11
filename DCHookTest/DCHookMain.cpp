@@ -1131,31 +1131,18 @@ bool TDCHookMainForm::DoPopup( const tchar *text, int click_pos, const tchar *pr
 		}
 		if ( CtrlClose )
 			DdePoke( PdicDde, "PopupSearchConfig", "c1" );	// Ctrl close
-	//	Sleep(1000);
+		//	Sleep(1000);
 		DdePoke( PdicDde, "PopupSearchConfig", "o1w1" );	// overlap window and no wait transaction
-		if ( prevtext && (prevtext != text) ){
-			//DBW("prevtext="FMTS,prevtext);
-#if 1
-			int len = _tcslen(prevtext);
-			tchar *buf = new tchar[len+10];
-			_itow( STR_DIFF(text, prevtext) + click_pos, buf, 10 );	// クリック位置
-			tchar *dp = buf + _tcslen(buf);
-			*dp++ = ',';
-			wcscpy( dp, prevtext );
-			DdePoke( PdicDde, "PopupSearch3", buf );
-	//		ExecuteMacro( "PopupSearch3", true );
-			delete[] buf;
-#else
-			DdePoke( PdicDde, "PopupSearch2", (tchar*)prevtext );
-	//		ExecuteMacro( "PopupSearch2", true );
-#endif
-			WaitTransaction( PdicDde );
-		} else {
-			//DBW("text="FMTS,text);
-			DdePoke( PdicDde, "PopupSearch", (tchar*)text );
-	//		PdicDde->ExecuteMacro( "PopupSearch", true );
-			WaitTransaction( PdicDde );
-		}
+		//DBW("prevtext="FMTS,prevtext);
+		int len = _tcslen(prevtext);
+		tchar *buf = new tchar[len+10];
+		_itow( STR_DIFF(text, prevtext) + click_pos, buf, 10 );	// クリック位置
+		tchar *dp = buf + _tcslen(buf);
+		*dp++ = ',';
+		wcscpy( dp, prevtext );
+		DdePoke( PdicDde, "PopupSearch3", buf );
+		delete[] buf;
+		WaitTransaction( PdicDde );
 		DdePoke( PdicDde, "Close", "" );
 	}
 	ClosePdic( PdicDde );
