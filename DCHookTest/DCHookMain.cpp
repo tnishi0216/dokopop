@@ -119,6 +119,12 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	Banner    = Ini->ReadInteger( PFS_CONFIG, PFS_BANNER, true );
 	EnableAdvanced = Ini->ReadInteger( PFS_CONFIG, PFS_ADVANCED, false );
 
+	AnsiString bmp = ExtractFilePath( Application->ExeName );
+	bmp += NAME_BMPFILE;
+	if ( FileExists( bmp ) ){
+		Image->Picture->Bitmap->LoadFromFile( bmp );
+	}
+
 #ifndef _DEBUG
 	BorderStyle = bsNone;
 
@@ -132,12 +138,6 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 #if 0
 	Title->Visible = true;
 #endif
-
-	AnsiString bmp = ExtractFilePath( Application->ExeName );
-	bmp += NAME_BMPFILE;
-	if ( FileExists( bmp ) ){
-		Image->Picture->Bitmap->LoadFromFile( bmp );
-	}
 
 	Width = Image->Picture->Width;
 	Height = Image->Picture->Height;
@@ -173,21 +173,8 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 	}
 #endif
 
-	//TODO: default=ON‚É‚·‚é‚Æ•sˆÀ’è‚É‚È‚é‚Ì‚Å‚µ‚Î‚ç‚­def=false
-	//MouseIncSrch = Ini->ReadInteger( PFS_CONFIG, PFS_INCSRCH, MouseIncSrch );
-	CaptureMode = Ini->ReadInteger( PFS_CONFIG, PFS_CAPTURE_MODE, CaptureMode );
-	InitATSOCR();
-	btnOK->Left = (SavedWidth - btnOK->Width)>>1;
-	btnOK->Top = Height - btnOK->Height - 8;
-	lbVersion->Caption = GetStrVersion();
-	lbVersion->Left = btnOK->Left + btnOK->Width + 4;
-	lbVersion->Top = btnOK->Top;
-	
+	BootTimer0->Enabled = true;	
 	BootTimer->Enabled = true;
-
-	if (!ATSOCRAvail && (GetActualCaptureMode() & CM_IMAGE)){
-		tmDNFNotify->Enabled = true;
-	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::FormCloseQuery(TObject *Sender,
@@ -486,6 +473,23 @@ void __fastcall TDCHookMainForm::TestTimerTimer(TObject *Sender)
 	}
 #endif
 #endif
+}
+//---------------------------------------------------------------------------
+void __fastcall TDCHookMainForm::BootTimer0Timer(TObject *Sender)
+{
+	//TODO: default=ON‚É‚·‚é‚Æ•sˆÀ’è‚É‚È‚é‚Ì‚Å‚µ‚Î‚ç‚­def=false
+	//MouseIncSrch = Ini->ReadInteger( PFS_CONFIG, PFS_INCSRCH, MouseIncSrch );
+	CaptureMode = Ini->ReadInteger( PFS_CONFIG, PFS_CAPTURE_MODE, CaptureMode );
+	InitATSOCR();
+	btnOK->Left = (SavedWidth - btnOK->Width)>>1;
+	btnOK->Top = Height - btnOK->Height - 8;
+	lbVersion->Caption = GetStrVersion();
+	lbVersion->Left = btnOK->Left + btnOK->Width + 4;
+	lbVersion->Top = btnOK->Top;
+
+	if (!ATSOCRAvail && (GetActualCaptureMode() & CM_IMAGE)){
+		tmDNFNotify->Enabled = true;
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TDCHookMainForm::BootTimerTimer(TObject *Sender)
