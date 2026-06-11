@@ -2652,6 +2652,7 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 
 	LPBITMAPFILEHEADER lpHead = (LPBITMAPFILEHEADER)lpBuf;
 	LPBITMAPINFOHEADER lpInfo = (LPBITMAPINFOHEADER)(lpBuf+sizeof(BITMAPFILEHEADER));
+	memset(lpBuf, 0, sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
 	LPBYTE lpPixel = lpBuf+sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
 
 	/* 24ビットBMPファイルのヘッダ作成 */
@@ -2663,6 +2664,7 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 	lpInfo->biHeight = h;
 	lpInfo->biPlanes = 1;
 	lpInfo->biBitCount = 24;
+	lpInfo->biCompression = BI_RGB;
 
 	HBITMAP hBmp = CreateCompatibleBitmap(hdc, w, h);
 	if (hBmp){
@@ -2678,13 +2680,13 @@ bool CaptureImage(HWND hwnd, bool movesend, bool non_block)
 					if (lines!=0){
 						ok = true;
 					} else {
-						dbw("GetDIBits error??? %d h=%d w=%d bfSize=%d", GetLastError(), h, w, dwFSize);
+						dbw("GetDIBits error??? %d hBmp=%08X h=%d w=%d lpPixel=%08X bfSize=%d", GetLastError(), (int)hBmp, h, w, (int)lpPixel, dwFSize);
 					}
 				} else {
 //						dbw("BitBlt error??? %d", GetLastError());
 				}
 			}
-			DeleteObject(hdcMem);
+			DeleteDC(hdcMem);
 		}
 		DeleteObject(hBmp);
 	}
