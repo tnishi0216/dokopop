@@ -1258,9 +1258,8 @@ void TDCHookMainForm::EvMoveSend(bool enable)
 }
 void TDCHookMainForm::RegisterTrayIcon( bool flag )
 {
-  NOTIFYICONDATA m_tnid;  //‚±‚ê‚Í*.h‚Å’è‹`‚µ‚Ä‚¨‚­
+  NOTIFYICONDATA m_tnid = {sizeof(NOTIFYICONDATA)};
 
-  m_tnid.cbSize = sizeof(NOTIFYICONDATA);
   m_tnid.hWnd = Handle;
   m_tnid.uID = 1;
   m_tnid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
