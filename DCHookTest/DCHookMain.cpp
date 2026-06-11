@@ -163,7 +163,6 @@ void __fastcall TDCHookMainForm::FormCreate(TObject *Sender)
 		// というわけで幅をゼロにしてWindowを非表示化とうい邪道な方法
 		// 最初からずっとVisible=falseという方法もあるが、
 		// VCLがMainWindowを必ずvisibleにする処理を行っているため不可能
-		// ほかにいい方法があったような気がするが、、、、 
 		Width = 0;
 	} else {
 		Visible = true;	// 最小化で起動すると、アイコン表示が消えないため。
@@ -604,16 +603,16 @@ void TDCHookMainForm::InitATSOCR()
 void TDCHookMainForm::Start()
 {
 	BootTimer->Enabled = false;
-#ifndef _DEBUG
-	ShowWindow( Application->Handle, SW_HIDE );
-	Visible = false;	// これをfalseにしないとAlt+Tabでmain windowが見えてしまう
-	Width = 0;
-#endif
 	if ( BootUp ){
 		RegisterTrayIcon( true );
 		miHookClick( this );
 		BootUp = false;
 	}
+#ifndef _DEBUG
+	ShowWindow( Application->Handle, SW_HIDE );
+	Visible = false;	// これをfalseにしないとAlt+Tabでmain windowが見えてしまう
+	Width = 0;
+#endif
 }
 //---------------------------------------------------------------------------
 bool TDCHookMainForm::Hook()
