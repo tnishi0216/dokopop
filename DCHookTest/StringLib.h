@@ -52,7 +52,7 @@ inline bool IsWordChar( tuchar c )
 #ifdef _UNICODE
 	WORD ct;
 	GetStringTypeW(CT_CTYPE1,&c,1,&ct);
-	return (ct & (C1_ALPHA|C1_DIGIT)) || c=='-' || c==CODE_JPROLONG || c=='\'' || c=='_';
+	return (ct & (C1_ALPHA|C1_DIGIT/*|C3_KASHIDA*/)) || c=='-' || c==CODE_JPROLONG || c=='\'' || c=='_' || c == CODE_APOSTROPHE;
 #else
 	return isalphanum( c ) || c == '-' || c == '\'' || c >= 0xc0;
 #endif
