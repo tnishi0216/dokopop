@@ -4,20 +4,20 @@
 ------------------------------------------------------------------------
 %NEWMAJOR=2
 %NEWMINOR=1
-%NEWRELEASE=4
+%NEWRELEASE=5
 %POST=
 %OLDMAJOR=2
 %OLDMINOR=1
-%OLDRELEASE=3
+%OLDRELEASE=4
 %OLDPOST=
 
-%DATE_Y=21		公開日
-%DATE_M=08
-%DATE_D=21
+%DATE_Y=26		公開日
+%DATE_M=06
+%DATE_D=12
 
 %TIME_H=02
 %TIME_M=01
-%TIME_S=03
+%TIME_S=05
 
 %DATE_YY=20%DATE_Y%
 %VERSION = %NEWMAJOR%.%NEWMINOR%.%NEWRELEASE%%POST%
@@ -29,7 +29,7 @@
 %INSTALLER=DKPU%VER%.exe
 
 %HTML=S:\Web\NIFTY\
-%SAKURA=S:\web\sakura-pdic\cgi-bin\download\files\
+%SAKURA=S:\web\sakura-pdic\pub\
 
 #以下はMKU.BAT用
 %FDATE=%DATE_M%/%DATE_D%/%DATE_Y%
@@ -49,12 +49,17 @@
 
 ****************** UPDATE 内容 **************************************
 <*UPDATE.TXT
->> Ver.2.1.4 <<
-  ・高DPIモニターでうまく動作しない場合があった
+>> Ver.2.1.5 <<
+  ・マウスクリックしても検索しないときがあった
+  ・高DPIモニターでうまく動作しない場合があった(Windows8.1のみ)
+  ・Windows11でタスクトレイのアイコンが消えていた
 ##EOF
 ******************** DokoPop! の変更履歴 ****************************
 ##<*HISTORY.TXT
 ##>UPDATE.TXT
+
+>> Ver.2.1.4 <<
+  ・高DPIモニターでうまく動作しない場合があった
 
 >> Ver.2.1 <<
   ・二語前の単語を含めた連語のヒット対応（要：PDIC/Unicode Ver.5.10.24以上)
@@ -342,6 +347,8 @@ rem lha32 a %INSTALLER% DKPU.TXT DKPU.EXE DKPUHK.DLL
 ren %INSTALLER% %INSTALLER%
 rem touch -d%FDATE% -t%FTIME% -c %INSTALLER%
 
+sha2.py %INSTALLER% > %INSTALLER%.sha256
+
 echo/
 echo ソースファイルをzipします
 echo/
@@ -367,7 +374,9 @@ pause
 rem copy %INSTALLER% %HTML%
 rem del %HTML%DKPU%OLDVER%.EXE
 copy %INSTALLER% %SAKURA%
+copy %INSTALLER%.sha256 %SAKURA%
 del %SAKURA%DKPU%OLDVER%.EXE
+del %SAKURA%DKPU%OLDVER%.EXE.sha256
 
 rem echo [del] >> %HTML%ftp.ctl
 rem echo DKPU%OLDVER%.EXE >> %HTML%ftp.ctl
