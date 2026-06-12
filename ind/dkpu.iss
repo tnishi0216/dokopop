@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=DokoPop! (Unicode)
-AppVerName=DokoPop! 2.1.4
+AppVerName=DokoPop! 3.0.1
 AppPublisher=DokoPop Project
 DefaultDirName={pf}\DokoPop! (Unicode)
 DefaultGroupName=DokoPop! (Unicode)

@@ -2,22 +2,22 @@
 ------------------------------------------------------------------------
  DCHOOK/Unicode Document Template
 ------------------------------------------------------------------------
-%NEWMAJOR=2
-%NEWMINOR=1
-%NEWRELEASE=4
+%NEWMAJOR=3
+%NEWMINOR=0
+%NEWRELEASE=1
 %POST=
-%OLDMAJOR=2
-%OLDMINOR=1
-%OLDRELEASE=3
+%OLDMAJOR=3
+%OLDMINOR=0
+%OLDRELEASE=0
 %OLDPOST=
 
-%DATE_Y=21		公開日
-%DATE_M=08
-%DATE_D=21
+%DATE_Y=26		公開日
+%DATE_M=06
+%DATE_D=12
 
-%TIME_H=02
-%TIME_M=01
-%TIME_S=03
+%TIME_H=03
+%TIME_M=00
+%TIME_S=01
 
 %DATE_YY=20%DATE_Y%
 %VERSION = %NEWMAJOR%.%NEWMINOR%.%NEWRELEASE%%POST%
@@ -29,7 +29,7 @@
 %INSTALLER=DKPU%VER%.exe
 
 %HTML=S:\Web\NIFTY\
-%SAKURA=S:\web\sakura-pdic\cgi-bin\download\files\
+%SAKURA=S:\web\sakura-pdic\pub\
 
 #以下はMKU.BAT用
 %FDATE=%DATE_M%/%DATE_D%/%DATE_Y%
@@ -49,12 +49,21 @@
 
 ****************** UPDATE 内容 **************************************
 <*UPDATE.TXT
->> Ver.2.1.4 <<
-  ・高DPIモニターでうまく動作しない場合があった
+>> Ver.3.0.1 <<
+  ・文字認識はTesseract-OCRに変更など
+
 ##EOF
 ******************** DokoPop! の変更履歴 ****************************
 ##<*HISTORY.TXT
 ##>UPDATE.TXT
+
+>> Ver.2.1.5 <<
+  ・マウスクリックしても検索しないときがあった
+  ・高DPIモニターでうまく動作しない場合があった(Windows8.1のみ)
+  ・Windows11でタスクトレイのアイコンが消えていた
+
+>> Ver.2.1.4 <<
+  ・高DPIモニターでうまく動作しない場合があった
 
 >> Ver.2.1 <<
   ・二語前の単語を含めた連語のヒット対応（要：PDIC/Unicode Ver.5.10.24以上)
@@ -119,8 +128,8 @@
 【検索  キー】　1:%KEY1% 2:%KEY2% 3:%KEY3% 4:%KEY4% 5:%KEY5%
 【著作権  者】　なし
 【掲  載  者】　DokoPop Project
-【対応  機種】　MS-Windows Vista/7/8/8.1/10
-【動作  確認】　IBM PC/AT互換機,7/8/8.1/10
+【対応  機種】　MS-Windows 8.1/10/11
+【動作  確認】　IBM PC/AT互換機,8.1/10/11
 【掲  載  日】　%DATE%
 【作成  方法】　%INSTALLER% を実行する
 【ｿﾌﾄｳｪｱ種別】　フリーウェア
@@ -153,7 +162,8 @@
 
 動作確認OS ---------------------------------------------------
 
-　Windows7/8/8.1/10
+　Windows8.1/10/11
+　※Windows7は動作しますが、コントロールパネルによるWindowsUpdateができないため（自力Updateが必要）
 
 準備 ---------------------------------------------------------
 
@@ -240,18 +250,17 @@
   ■英数字のみ検索する
     日本語・英数字混在の文章があった場合、日本語を無視して検索を行います。
     混在文章では ON にしたほうがヒットしやすくなります。
-    また、フランス語、ドイツ語のようなウムラウト・アクサンなどを
-    含む文章ではここを OFF にしないとうまく動作しない場合があります。
 
-  ■認識モードの設定
+  ■詳細設定 - 認識モードの設定
     ・文字認識＋文字抽出
-    ・文字認識のみ
+    ・文字認識のみ ←オススメ
     ・文字抽出のみ
     通常一番上の設定がいいと思いますが、ポップアップしない、アプリが落ちる、などの場合は
     設定を変更するとうまくいくようになるかもしれません。
+    ※詳細設定をOFFにした場合、「文字認識のみ」になります
     ※DokoPop! Ver.1は「文字抽出のみ」と同じ動作をします
 
-  ■64ビットフックを使用する
+  ■詳細設定 - 64ビットフックを使用する
     64bitWindowsでうまくヒットしない場合にここをチェックすると動作するかもしれません。
 
 言語判定DLL --------------------------------------------------
@@ -297,9 +306,8 @@ echo 完全版パッケージを作成します
 echo/
 echo ■確認事項
 echo ・./dchooktest/dchooktest.exeを準備(USE_UNICODE defined)
-echo ・バージョン番号：.bpr、Util.cpp(StrVersion, VersionValue)と.tplが必要
+echo ・バージョン番号：.bpr .tpl の変更が必要
 echo ・Release Build?
-echo ・VisualStudio2008でbuildしたか？ for W2K
 pause
 set TZ=JST-9
 
@@ -333,14 +341,7 @@ rem lha32 a %INSTALLER% DKPU.TXT DKPU.EXE DKPUHK.DLL
 ren %INSTALLER% %INSTALLER%
 rem touch -d%FDATE% -t%FTIME% -c %INSTALLER%
 
-echo/
-echo ソースファイルをzipします
-echo/
-pause
-
-make zip_src
-copy src.zip src-%VERSION%.zip
-rem copy src-%VERSION%.zip zip
+sha2.py %INSTALLER% > %INSTALLER%.sha256
 
 echo/
 echo 公開用ファイルを更新します
@@ -355,15 +356,29 @@ echo Web用のファイルを更新します
 echo/
 pause
 
+rem 正式版後有効
+rem perl -S deploy.pl dokopop -rc:DCHookTest\DCHookTest.rc -sha2 @sakura
+
 rem copy %INSTALLER% %HTML%
 rem del %HTML%DKPU%OLDVER%.EXE
 copy %INSTALLER% %SAKURA%
+copy %INSTALLER%.sha256 %SAKURA%
 del %SAKURA%DKPU%OLDVER%.EXE
+del %SAKURA%DKPU%OLDVER%.EXE.sha256
 
 rem echo [del] >> %HTML%ftp.ctl
 rem echo DKPU%OLDVER%.EXE >> %HTML%ftp.ctl
 rem echo [include] >> %HTML%ftp.ctl
 rem echo %INSTALLER% >> %HTML%ftp.ctl
+
+echo/
+echo ソースファイルをzipします
+echo/
+pause
+
+make zip_src
+copy src.zip src-%VERSION%.zip
+rem copy src-%VERSION%.zip zip
 
 ##EOF
 
