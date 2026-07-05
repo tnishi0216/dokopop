@@ -45,5 +45,11 @@ zip_src:
 	zip -r src-amodi \src\amodi -i *.h *.c *.cpp *.cs *.dfm *.bpr *.bpf *.bpg *.rc *.ico *.bmp *.png *.txr *.ctt *.bat *.ind *.iss *.tpl *.manifest *.txt *.sln *.vcproj *.vcxproj *.user
 
 deploy:
+	-del deploydev
+	mktplu
+	mku
+
+deploydev:
+	echo > deploydev
 	mktplu
 	mku

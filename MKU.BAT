@@ -16,10 +16,10 @@ pause
 
 make copy_bin
 
-rem touch -d06/12/26 -t03:00:01 -c ind\DKPU.EXE ind\DKPUHK.DLL
+rem touch -d07/05/26 -t03:00:02 -c ind\DKPU.EXE ind\DKPUHK.DLL
 
 rem dkpu.issの更新
-perl change_iss.pl ind\dkpu.iss Setup AppVerName "DokoPop! 3.0.1" > ind\dkpu.iss.new
+change_iss.py ind\dkpu.iss Setup AppVerName "DokoPop! 3.0.2" > ind\dkpu.iss.new
 del ind\dkpu.iss.old
 ren ind\dkpu.iss dkpu.iss.old
 ren ind\dkpu.iss.new dkpu.iss
@@ -32,30 +32,21 @@ echo Press Enter key after installer made.
 echo/
 pause
 
-copy ind\Output\setup.EXE DKPU301.exe
-dir DKPU301.exe
+copy ind\Output\setup.EXE DKPU302.exe
+dir DKPU302.exe
 
-rem lha32 a DKPU301.exe DKPU.TXT DKPU.EXE DKPUHK.DLL
-ren DKPU301.exe DKPU301.exe
-rem touch -d06/12/26 -t03:00:01 -c DKPU301.exe
+rem lha32 a DKPU302.exe DKPU.TXT DKPU.EXE DKPUHK.DLL
+ren DKPU302.exe DKPU302.exe
+rem touch -d07/05/26 -t03:00:02 -c DKPU302.exe
 
-sha2.py DKPU301.exe > DKPU301.exe.sha256
-
-echo/
-echo ソースファイルをzipします
-echo/
-pause
-
-make zip_src
-copy src.zip src-3.0.1.zip
-rem copy src-3.0.1.zip zip
+sha2.py DKPU302.exe > DKPU302.exe.sha256
 
 echo/
 echo 公開用ファイルを更新します
 echo/
 rem pause
 
-perl -S -i.bak filestamp.pl DKPUu.TXT
+rem perl -S -i.bak filestamp.pl DKPUu.TXT
 del DKPUu.TXT.bak
 
 echo/
@@ -63,15 +54,31 @@ echo Web用のファイルを更新します
 echo/
 pause
 
-rem copy DKPU301.exe S:\Web\NIFTY\
-rem del S:\Web\NIFTY\DKPU300.EXE
-copy DKPU301.exe S:\web\sakura-pdic\pub\
-copy DKPU301.exe.sha256 S:\web\sakura-pdic\pub\
-del S:\web\sakura-pdic\pub\DKPU300.EXE
-del S:\web\sakura-pdic\pub\DKPU300.EXE.sha256
+rem 正式版後有効
+if not exist deploydev (
+	deploy.py dokopop -rc:DCHookTest\DCHookTest.bpr -setup:DKPU302.exe -skip:setupcopy -sha2 @sakura
+)
+
+pause
+
+rem copy DKPU302.exe S:\Web\NIFTY\
+rem del S:\Web\NIFTY\DKPU301.EXE
+copy DKPU302.exe S:\web\sakura-pdic\pub\
+copy DKPU302.exe.sha256 S:\web\sakura-pdic\pub\
+del S:\web\sakura-pdic\pub\DKPU301.EXE
+del S:\web\sakura-pdic\pub\DKPU301.EXE.sha256
 
 rem echo [del] >> S:\Web\NIFTY\ftp.ctl
-rem echo DKPU300.EXE >> S:\Web\NIFTY\ftp.ctl
+rem echo DKPU301.EXE >> S:\Web\NIFTY\ftp.ctl
 rem echo [include] >> S:\Web\NIFTY\ftp.ctl
-rem echo DKPU301.exe >> S:\Web\NIFTY\ftp.ctl
+rem echo DKPU302.exe >> S:\Web\NIFTY\ftp.ctl
+
+echo/
+echo ソースファイルをzipします
+echo/
+pause
+
+make zip_src
+copy src.zip src-3.0.2.zip
+rem copy src-3.0.2.zip zip
 

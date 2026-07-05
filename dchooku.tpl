@@ -1,23 +1,23 @@
-#!perl -S mktpl.pl dchooku.tpl
+#!mktpl.py dchooku.tpl
 ------------------------------------------------------------------------
  DCHOOK/Unicode Document Template
 ------------------------------------------------------------------------
 %NEWMAJOR=3
 %NEWMINOR=0
-%NEWRELEASE=1
+%NEWRELEASE=2
 %POST=
 %OLDMAJOR=3
 %OLDMINOR=0
-%OLDRELEASE=0
+%OLDRELEASE=1
 %OLDPOST=
 
 %DATE_Y=26		公開日
-%DATE_M=06
-%DATE_D=12
+%DATE_M=07
+%DATE_D=05
 
 %TIME_H=03
 %TIME_M=00
-%TIME_S=01
+%TIME_S=02
 
 %DATE_YY=20%DATE_Y%
 %VERSION = %NEWMAJOR%.%NEWMINOR%.%NEWRELEASE%%POST%
@@ -39,7 +39,7 @@
 
 %VARFILE=%HTML%pdic-unicode.var
 %IND=dchooku.ind
-%CHGINI=perl -S chgini.pl
+%CHGINI=chgini.py
 
 %KEY1=DOKOPOP
 %KEY2=PDIC
@@ -49,13 +49,16 @@
 
 ****************** UPDATE 内容 **************************************
 <*UPDATE.TXT
->> Ver.3.0.1 <<
-  ・文字認識はTesseract-OCRに変更など
+>> Ver.3.0.2 <<
+  ・正式リリース
 
 ##EOF
 ******************** DokoPop! の変更履歴 ****************************
 ##<*HISTORY.TXT
 ##>UPDATE.TXT
+
+>> Ver.3.0.1 <<
+  ・文字認識はTesseract-OCRに変更など
 
 >> Ver.2.1.5 <<
   ・マウスクリックしても検索しないときがあった
@@ -321,7 +324,7 @@ make copy_bin
 rem touch -d%FDATE% -t%FTIME% -c ind\DKPU.EXE ind\DKPUHK.DLL
 
 rem dkpu.issの更新
-perl change_iss.pl ind\dkpu.iss Setup AppVerName "DokoPop! %VERSION%" > ind\dkpu.iss.new
+change_iss.py ind\dkpu.iss Setup AppVerName "DokoPop! %VERSION%" > ind\dkpu.iss.new
 del ind\dkpu.iss.old
 ren ind\dkpu.iss dkpu.iss.old
 ren ind\dkpu.iss.new dkpu.iss
@@ -348,7 +351,7 @@ echo 公開用ファイルを更新します
 echo/
 rem pause
 
-perl -S -i.bak filestamp.pl DKPUu.TXT
+rem perl -S -i.bak filestamp.pl DKPUu.TXT
 del DKPUu.TXT.bak
 
 echo/
@@ -357,7 +360,9 @@ echo/
 pause
 
 rem 正式版後有効
-rem perl -S deploy.pl dokopop -rc:DCHookTest\DCHookTest.rc -sha2 @sakura
+if not exist deploydev (
+	deploy.py dokopop -rc:DCHookTest\DCHookTest.bpr -setup:%INSTALLER% -skip:setupcopy -sha2 @sakura
+)
 
 rem copy %INSTALLER% %HTML%
 rem del %HTML%DKPU%OLDVER%.EXE

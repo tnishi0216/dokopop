@@ -51,8 +51,8 @@ IncludeVerInfo=1
 AutoIncBuild=1
 MajorVer=3
 MinorVer=0
-Release=1
-Build=80
+Release=2
+Build=82
 Debug=0
 PreRelease=0
 Special=0
@@ -64,13 +64,13 @@ CodePage=932
 [Version Info Keys]
 CompanyName=Doko Pop Project
 FileDescription=DokoPop for Windows
-FileVersion=3.0.1.80
+FileVersion=3.0.2.82
 InternalName=DokoPop
 LegalCopyright=Copyright (c) DokoPopProject
 LegalTrademarks=
 OriginalFilename=DKPP.EXE
 ProductName=DokoPop
-ProductVersion=2.0
+ProductVersion=3.0
 Comments=
 
 [Excluded Packages]

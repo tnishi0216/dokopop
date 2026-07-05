@@ -1,2 +1,2 @@
 @echo off
-Perl -S mktpl.pl dchooku.tpl
+mktpl.py dchooku.tpl
